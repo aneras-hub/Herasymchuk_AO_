@@ -20,6 +20,8 @@ namespace ConsoleApp1
         public string Notes { get; set; } = "Немає нотаток";
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
+        public byte[] LabGrades { get; set; } = new byte[10];
+
         public required string fullName
         {
             get => FullName;
@@ -114,5 +116,17 @@ namespace ConsoleApp1
             int yearsLeft = graduationYear - DateTime.Today.Year;
             return Math.Max(0, yearsLeft);
         }
+        public void AddLabGrade(int labNumber, byte grade)
+        {
+            if (labNumber < 0 || labNumber >= LabGrades.Length)
+                throw new IndexOutOfRangeException($"Номер лабораторної має бути від 0 до {LabGrades.Length - 1}.");
+
+            if (grade > 100)
+                throw new ArgumentException("Оцінка не може бути більшою за 100.");
+
+            LabGrades[labNumber] = grade;
+        }
+        public double GetAverageLabGrade() =>
+            LabGrades.Any(g => g > 0) ? LabGrades.Where(g => g > 0).Average(g => (int)g) : 0;
     }
 }
