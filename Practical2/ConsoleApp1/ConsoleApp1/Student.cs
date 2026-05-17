@@ -21,7 +21,8 @@ namespace ConsoleApp1
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
         public byte[] LabGrades { get; set; } = new byte[10];
-
+        public int PortRow { get; set; } = -1;
+        public int PortCol { get; set; } = -1;
         public required string fullName
         {
             get => FullName;
