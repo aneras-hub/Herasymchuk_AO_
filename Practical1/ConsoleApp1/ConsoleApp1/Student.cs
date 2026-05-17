@@ -81,5 +81,38 @@ namespace ConsoleApp1
         {
             averageGrade = grade;
         }
+        public string ShowDetailedInfo()
+        {
+            return $"--- Картка студента ---\n" +
+                   $"ПІБ: {fullName}\n" +
+                   $"Вік: {Age} років\n" +
+                   $"Залікова: {recordBookNumber}\n" +
+                   $"Середній бал: {averageGrade}\n" +
+                   $"Статус: {Status}\n" +
+                   $"Email: {personalEmail}\n" +
+                   $"Нотатки: {Notes}\n";
+        }
+        public void UpdateAverageGrade(double newGrade)
+        {
+            averageGrade = newGrade;
+        }
+
+        public bool IsExcellent() => averageGrade >= 90;
+        public bool IsFailing() => averageGrade < 60;
+
+        public int CalculateAge()
+        {
+            var today = DateTime.Today;
+            int age = today.Year - DateOfBirth.Year;
+            if (DateOfBirth.Date > today.AddYears(-age)) age--;
+            return age;
+        }
+
+        public int GetYearsToGraduation()
+        {
+            int graduationYear = EnrollmentDate.Year + 4;
+            int yearsLeft = graduationYear - DateTime.Today.Year;
+            return Math.Max(0, yearsLeft);
+        }
     }
 }
