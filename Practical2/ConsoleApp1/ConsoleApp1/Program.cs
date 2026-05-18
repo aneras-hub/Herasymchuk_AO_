@@ -460,7 +460,6 @@ class Program
             Console.WriteLine("Нічого не знайдено");
             return;
         }
-
         foreach (var port in ports)
         {
             Console.WriteLine(port.GetPortInfo());
