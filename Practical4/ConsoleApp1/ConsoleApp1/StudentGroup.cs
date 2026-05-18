@@ -36,7 +36,6 @@ namespace ConsoleApp1
                     StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
-        // ПРАКТИЧНА ТРИ 1
         public string SearchByNameFragment(string fragment)
         {
             StringBuilder sb = new StringBuilder();
@@ -56,8 +55,6 @@ namespace ConsoleApp1
             }
             return sb.ToString();
         }
-        // кінцева практика 3
-        // ПРАКТИКА ТРИ 1
         public string ExportToCsv()
         {
             StringBuilder sb = new StringBuilder();
@@ -74,8 +71,6 @@ namespace ConsoleApp1
             }
             return sb.ToString();
         }
-        // кінцева практика 3
-        // ПРАКТИЧНА ТРИ 1
         public void ImportStudentsFromText(string rawText)
         {
             if (string.IsNullOrWhiteSpace(rawText))
@@ -111,7 +106,6 @@ namespace ConsoleApp1
                 }
             }
         }
-        // кінцева практика 3
         public Student FindByRecordBook(string recordBookNumber)
         {
             return _students.FirstOrDefault(s => s.recordBookNumber == recordBookNumber);
@@ -241,6 +235,8 @@ namespace ConsoleApp1
         {
             return _students;
         }
+        // ПРАКТИЧНА 4 2
+
         public static StudentGroup operator +(StudentGroup a, StudentGroup b)
         {
             StudentGroup merged = new StudentGroup
@@ -277,6 +273,49 @@ namespace ConsoleApp1
         }
 
         // К
+        //ПРАКТИЧНА 4 3
+        public Student BestStudent()
+        {
+            if (_students.Count == 0)
+                return null;
 
+            Student best = _students[0];
+
+            foreach (var student in _students)
+            {
+                if (student > best)
+                {
+                    best = student;
+                }
+            }
+
+            return best;
+        }
+        public StudentGroup MergeGroups(StudentGroup other)
+        {
+            return this + other;
+        }
+        // Порівняння груп за середнім балом
+
+        public static bool operator >(StudentGroup a, StudentGroup b)
+        {
+            return a.AverageGroupGrade > b.AverageGroupGrade;
+        }
+
+        public static bool operator <(StudentGroup a, StudentGroup b)
+        {
+            return a.AverageGroupGrade < b.AverageGroupGrade;
+        }
+
+        public static bool operator >=(StudentGroup a, StudentGroup b)
+        {
+            return a.AverageGroupGrade >= b.AverageGroupGrade;
+        }
+
+        public static bool operator <=(StudentGroup a, StudentGroup b)
+        {
+            return a.AverageGroupGrade <= b.AverageGroupGrade;
+        }
+        //К
     }
 }
