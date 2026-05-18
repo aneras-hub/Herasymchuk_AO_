@@ -3,7 +3,6 @@ using System.Text;
 using System.Linq;
 using ConsoleApp1;
 using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 class Program
 {
     static void Main()
