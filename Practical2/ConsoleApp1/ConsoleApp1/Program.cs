@@ -2,7 +2,7 @@
 using System.Text;
 using System.Linq;
 using ConsoleApp1;
-
+using System.IO;
 class Program
 {
     static void Main()
@@ -23,14 +23,24 @@ class Program
             Console.WriteLine($"=== ГРУПА {group.GroupName} ===");
             Console.WriteLine("1. Додати студента");
             Console.WriteLine("2. Видалити студента");
-            Console.WriteLine("3. Вивести всіх (пагінація)");
+            Console.WriteLine("3. Вивести студентів з лабораторними");
             Console.WriteLine("4. Пошук");
             Console.WriteLine("5. Редагування");
             Console.WriteLine("6. Фільтр");
-            Console.WriteLine("7. Статистика");
-            Console.WriteLine("8. Зберегти");
-            Console.WriteLine("9. Завантажити");
-            Console.WriteLine("10. Додати оцінку");
+            Console.WriteLine("7. Додати оцінку");
+            Console.WriteLine("8. Ініціалізувати матрицю портів");
+            Console.WriteLine("9. Відкрити / закрити порт");
+            Console.WriteLine("10. Записати дані в порт");
+            Console.WriteLine("11. Прочитати дані з порту");
+            Console.WriteLine("12. Вивести матрицю портів");
+            Console.WriteLine("13. Прив'язати студента до порту");
+            Console.WriteLine("14. Симулювати лабораторну");
+            Console.WriteLine("15. Переглянути лог портів");
+            Console.WriteLine("16. Зберегти дані");
+            Console.WriteLine("17. Завантажити дані");
+            Console.WriteLine("18. Статистика");
+            Console.WriteLine("19. Пошук відкритих портів");
+            Console.WriteLine("20. Великий звіт");
             Console.WriteLine("0. Вихід");
 
             string choice = Console.ReadLine();
@@ -43,13 +53,23 @@ class Program
                 case "4": Search(group); break;
                 case "5": Edit(group); break;
                 case "6": Filter(group); break;
-                case "7": Stats(group); break;
-                case "8": group.SaveToFile(fileName); break;
-                case "9": group.LoadFromFile(fileName); break;
-                case "10": AddGrade(group); break;
+                case "7": AddGrade(group); break;
+                case "8": InitializePorts(group); break;
+                case "9": TogglePort(group); break;
+                case "10": WriteToPort(group); break;
+                case "11": ReadFromPort(group); break;
+                case "12": ShowMatrix(group); break;
+                case "13": AssignStudent(group); break;
+                case "14": SimulateLab(group); break;
+                case "15": ShowLogs(group); break;
+                case "16": group.SaveToFile(fileName); break;
+                case "17": group.LoadFromFile(fileName); break;
+                case "18": Stats(group); break;
+                case "19": SearchOpenPorts(group); break;
+                case "20": BigReport(group); break;
                 case "0": return;
+                default: Console.WriteLine("Невірний вибір"); break;
             }
-
             Console.WriteLine("\nНатисніть клавішу...");
             Console.ReadKey();
         }
@@ -76,11 +96,13 @@ class Program
 
             Console.Write("Початковий бал: ");
             if (double.TryParse(Console.ReadLine(), out double g))
+            {
                 student.Journal.SetGrade("Старт", g);
+            }
 
             group.AddStudent(student);
 
-            Console.WriteLine("Додано");
+            Console.WriteLine("Студента додано");
         }
         catch (Exception ex)
         {
@@ -99,7 +121,7 @@ class Program
         int page = 0;
         int size = 10;
 
-        var all = group.FindStudent("");
+        var all = group.FindByName("");
 
         while (true)
         {
@@ -120,10 +142,10 @@ class Program
     // Пошук
     static void Search(StudentGroup group)
     {
-        Console.Write("Пошук за ім'ям: ");
+        Console.Write("Пошук: ");
         string q = Console.ReadLine();
 
-        var list = group.FindStudent(q);
+        var list = group.FindByName(q);
 
         if (list.Count == 0)
             Console.WriteLine("Нічого не знайдено");
@@ -140,7 +162,7 @@ class Program
             return;
         }
 
-        var s = group.FindStudent(id);
+        var s = group.FindByRecordBook(id.ToString());
         if (s == null)
         {
             Console.WriteLine("Не знайдено");
@@ -180,7 +202,7 @@ class Program
         {
             try
             {
-                updated.UpdateAverageGrade(g);
+                updated.Journal.SetGrade("Редагований бал", g);
             }
             catch (Exception ex)
             {
@@ -204,36 +226,51 @@ class Program
         if (c == "1")
             group.GetExcellentStudents().ForEach(s => Console.WriteLine(s.ShowDetailedInfo()));
         else
-            group.FindStudent("").Where(s => s.IsFailing()).ToList()
+            group.FindByName("").Where(s => s.IsFailing()).ToList()
                 .ForEach(s => Console.WriteLine(s.ShowDetailedInfo()));
     }
     // Статистика
     static void Stats(StudentGroup group)
     {
-        Console.WriteLine($"Кількість: {group.GroupSize}");
-        Console.WriteLine($"Середній: {group.AverageGroupGrade}");
+        Console.WriteLine($"Кількість студентів: {group.GroupSize}");
+        Console.WriteLine($"Середній бал групи: {group.AverageGroupGrade}");
+        Console.WriteLine($"Активних портів: {group.GetOpenedPortsCount()}");
     }
-    // Додавання оцінки з валідацією
-    static void AddGrade(StudentGroup group)
-    {
-        Console.Write("Номер: ");
-        if (!int.TryParse(Console.ReadLine(), out int id)) return;
-
-        var s = group.FindStudent(id);
-        if (s == null) return;
-
-        Console.Write("Предмет: ");
-        string sub = Console.ReadLine();
-
-        Console.Write("Оцінка: ");
-        if (double.TryParse(Console.ReadLine(), out double g))
-            s.Journal.SetGrade(sub, g);
-    }
-    // Допоміжні методи для читання з консолі з валідацією
     static string Read(string msg)
     {
         Console.Write(msg);
         return Console.ReadLine();
+    }
+    static void AddGrade(StudentGroup group)
+    {
+        Console.Write("Номер студента: ");
+
+        if (!int.TryParse(Console.ReadLine(), out int id))
+        {
+            Console.WriteLine("Невірний номер");
+            return;
+        }
+
+        Student student = group.FindByRecordBook(id.ToString());
+
+        if (student == null)
+        {
+            Console.WriteLine("Студента не знайдено");
+            return;
+        }
+        Console.Write("Предмет: ");
+        string subject = Console.ReadLine();
+        Console.Write("Оцінка: ");
+        if (double.TryParse(Console.ReadLine(), out double grade))
+        {
+            student.Journal.SetGrade(subject, grade);
+
+            Console.WriteLine("Оцінку додано");
+        }
+        else
+        {
+            Console.WriteLine("Невірна оцінка");
+        }
     }
     // Метод для читання дати з валідацією
     static DateTime ReadDate(string msg)
@@ -245,5 +282,198 @@ class Program
                 return d;
             Console.WriteLine("Невірна дата");
         }
+    }
+    // запуск порта
+    static void InitializePorts(StudentGroup group)
+    {
+        group.GetPortMatrix().ToString();
+
+        Console.WriteLine("Матриця портів 16x16 успішно ініціалізована");
+    }
+
+    static void TogglePort(StudentGroup group)
+    {
+        int row = ReadInt("Ряд: ");
+        int col = ReadInt("Стовпець: ");
+
+        Port port = group.GetPortMatrix().GetPort(row, col);
+
+        if (port.IsOpen)
+        {
+            group.GetPortMatrix().ClosePort(row, col);
+
+            Console.WriteLine("Порт закрито");
+        }
+        else
+        {
+            group.GetPortMatrix().OpenPort(row, col);
+
+            Console.WriteLine("Порт відкрито");
+        }
+    }
+    static void WriteToPort(StudentGroup group)
+    {
+        int row = ReadInt("Ряд: ");
+        int col = ReadInt("Стовпець: ");
+
+        Console.Write("Дані: ");
+
+        string text = Console.ReadLine();
+
+        byte[] data = Encoding.UTF8.GetBytes(text);
+
+        try
+        {
+            group.GetPortMatrix().WriteToPort(row, col, data);
+
+            Console.WriteLine("Дані записані");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    static void ReadFromPort(StudentGroup group)
+    {
+        int row = ReadInt("Ряд: ");
+        int col = ReadInt("Стовпець: ");
+
+        try
+        {
+            byte[] data = group.GetPortMatrix().ReadFromPort(row, col);
+
+            string text = Encoding.UTF8.GetString(data);
+
+            Console.WriteLine($"\nДані з порту:\n{text}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    static void ShowMatrix(StudentGroup group)
+    {
+        Console.WriteLine(
+            group.GetPortMatrix().ScanMatrix()
+        );
+    }
+    static void AssignStudent(StudentGroup group)
+    {
+        Console.Write("Номер студента: ");
+
+        if (!int.TryParse(Console.ReadLine(), out int id))
+        {
+            Console.WriteLine("Невірний номер");
+            return;
+        }
+
+        Student student = group.FindByRecordBook(id.ToString());
+
+        if (student == null)
+        {
+            Console.WriteLine("Студента не знайдено");
+            return;
+        }
+
+        int row = ReadInt("Ряд порту: ");
+        int col = ReadInt("Стовпець порту: ");
+
+        try
+        {
+            group.AssignStudentToPort(student, row, col);
+
+            Console.WriteLine("Студента прив'язано до порту");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    static void SimulateLab(StudentGroup group)
+    {
+        Console.Write("Номер студента: ");
+
+        if (!int.TryParse(Console.ReadLine(), out int id))
+        {
+            Console.WriteLine("Невірний номер");
+            return;
+        }
+
+        Student student = group.FindByRecordBook(id.ToString());
+
+        if (student == null)
+        {
+            Console.WriteLine("Студента не знайдено");
+            return;
+        }
+
+        int lab = ReadInt("Номер лабораторної: ");
+
+        Console.Write("Оцінка: ");
+
+        if (!byte.TryParse(Console.ReadLine(), out byte grade))
+        {
+            Console.WriteLine("Невірна оцінка");
+            return;
+        }
+
+        Console.Write("Дані для порту: ");
+
+        string text = Console.ReadLine();
+
+        byte[] data = Encoding.UTF8.GetBytes(text);
+
+        group.SimulateLabWork(student, lab, grade, data);
+
+        Console.WriteLine("Лабораторну виконано");
+    }
+    static void ShowLogs(StudentGroup group)
+    {
+        Console.WriteLine(group.GetPortLogs());
+    }
+    static int ReadInt(string msg)
+    {
+        while (true)
+        {
+            Console.Write(msg);
+
+            if (int.TryParse(Console.ReadLine(), out int value))
+            {
+                return value;
+            }
+
+            Console.WriteLine("Невірне число");
+        }
+    }
+    static void SearchOpenPorts(StudentGroup group)
+    {
+        Console.Write("Назва пристрою: ");
+
+        string device = Console.ReadLine();
+
+        var ports = group.GetPortMatrix()
+                         .GetOpenPortsByDevice(device);
+
+        if (ports.Count == 0)
+        {
+            Console.WriteLine("Нічого не знайдено");
+            return;
+        }
+
+        foreach (var port in ports)
+        {
+            Console.WriteLine(port.GetPortInfo());
+        }
+    }
+    static void BigReport(StudentGroup group)
+    {
+        string report = group.GenerateBigReport();
+
+        Console.WriteLine(report);
+
+        File.WriteAllText("big_report.txt", report);
+
+        Console.WriteLine("Звіт збережено у файл big_report.txt");
     }
 }
