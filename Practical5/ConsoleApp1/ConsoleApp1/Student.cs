@@ -10,7 +10,7 @@ namespace ConsoleApp1
     public enum StudentStatus { Active, AcademicLeave, Expelled, Graduated }
     // ПРАКТИЧНА 5 1
     public class Student : Person, ICloneable
-        // К
+    // К
     {
         public DateTime EnrollmentDate { get; set; }
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
