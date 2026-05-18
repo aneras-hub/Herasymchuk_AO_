@@ -19,23 +19,34 @@ namespace ConsoleApp1
         public string Notes { get; set; } = "Немає нотаток";
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
-        // практична 2
-        // масив для зберігання оцінок за лабораторні роботи (макс 10 лаб)
         public byte[] LabGrades { get; set; } = new byte[10];
-        // координати для виведення в табличному форматі (ряд та стовпець)
         public int PortRow { get; set; } = -1;
         public int PortCol { get; set; } = -1;
+        // ПРАКТИЧНА ТРИ 1
         public required string fullName
         {
             get => FullName;
             set
             {
-                if (string.IsNullOrWhiteSpace(value) || value.Trim().Length < 5)
-                    throw new ArgumentException("ПІБ не може бути порожнім і має містити мінімум 5 символів.");
-                FullName = value.Trim();
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("ПІБ не може бути порожнім.");
+
+                string normalized = value.Trim();
+
+                string[] parts = normalized.Split(
+                    ' ',
+                    StringSplitOptions.RemoveEmptyEntries
+                );
+
+                if (parts.Length < 3)
+                    throw new ArgumentException(
+                        "ПІБ має містити мінімум 3 слова: прізвище, ім'я та по батькові."
+                    );
+
+                FullName = normalized;
             }
         }
-
+        // к
         public string recordBookNumber
         {
             get => RecordBookNumber;
@@ -74,34 +85,59 @@ namespace ConsoleApp1
         }
         public double averageGrade => Math.Round(Journal.GetAverage(), 2);
         public double AverageLabGrade => Math.Round(GetAverageLabGrade(), 2);
-
-        public string ShowDetailedInfo()
+        //ПРАКТИЧНА ТРИ 1
+        public string GetFormattedInfo(bool detailed = false)
         {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("--- Картка студента ---");
             sb.AppendLine($"ПІБ: {fullName}");
             sb.AppendLine($"Вік: {Age} років");
-            sb.AppendLine($"Залікова: {recordBookNumber}");
+            sb.AppendLine($"Залікова книжка: {recordBookNumber}");
             sb.AppendLine($"Середній бал: {averageGrade}");
-            sb.AppendLine($"Оцінки за лабораторні: {string.Join(", ", LabGrades)}");
-            sb.AppendLine($"Середній бал лабораторних: {AverageLabGrade}");
             sb.AppendLine($"Статус: {Status}");
-            sb.AppendLine($"Email: {personalEmail}");
-            sb.AppendLine($"Нотатки: {Notes}");
-
-            if (PortRow != -1 && PortCol != -1)
+            if (detailed)
             {
-                sb.AppendLine($"Порт: [{PortRow}, {PortCol}]");
-            }
-            else
-            {
-                sb.AppendLine("Порт не призначено");
-            }
+                sb.AppendLine($"Дата народження: {DateOfBirth:d}");
+                sb.AppendLine($"Дата вступу: {EnrollmentDate:d}");
+                sb.AppendLine($"Вік: {Age}");
+                sb.AppendLine($"Нотатки: {Notes}");
+                sb.AppendLine($"Оцінки за лабораторні: {string.Join(", ", LabGrades)}");
+                sb.AppendLine($"Середній бал лабораторних: {AverageLabGrade}");
 
+                if (PortRow != -1 && PortCol != -1)
+                {
+                    sb.AppendLine($"Порт: [{PortRow}, {PortCol}]");
+                }
+                else
+                {
+                    sb.AppendLine("Порт не призначено");
+                }
+            }
             return sb.ToString();
         }
+        // к
+        //ПРАКТИЧНА ТРИ 1
+        public bool ContainsKeyword(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+                return false;
 
+            return
+                fullName.Contains(keyword,
+                    StringComparison.OrdinalIgnoreCase)
+
+                || personalEmail.Contains(keyword,
+                    StringComparison.OrdinalIgnoreCase)
+
+                || Notes.Contains(keyword,
+                    StringComparison.OrdinalIgnoreCase);
+        }
+        public string ShowDetailedInfo()
+        {
+            return GetFormattedInfo(true);
+        }
+        //К
         public bool IsExcellent() => averageGrade >= 90;
         public bool IsFailing() => averageGrade < 60;
 
