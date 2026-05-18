@@ -3,6 +3,7 @@ using System.Text;
 using System.Linq;
 using ConsoleApp1;
 using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 class Program
 {
     static void Main()
@@ -23,6 +24,7 @@ class Program
         Console.WriteLine($"=== ГРУПА {group.GroupName} ===");
         Console.WriteLine("1. Основне меню");
         Console.WriteLine("2. Робота з текстом та звітами");
+        Console.WriteLine("3. Перевантаження операторів");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -32,6 +34,9 @@ class Program
             Console.WriteLine($"=== ГРУПА {group.GroupName} ===");
             Console.WriteLine("1. Основне меню");
             Console.WriteLine("2. Робота з текстом та звітами");
+            // ПРАКТИЧНА 4 5
+            Console.WriteLine("3. Перевантаження операторів");
+            // К
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -45,7 +50,11 @@ class Program
                 case "2":
                     TextReportsMenu(group, textProcessor, advancedLogger, moodAnalyzer);
                     break;
-
+                // ПРАКТИЧНА 4 5
+                case "3":
+                    OperatorsMenu(group);
+                    break;
+                // К
                 case "0":
                     return;
 
@@ -157,6 +166,66 @@ class Program
                 Console.ReadKey();
             }
         }
+        //ПРАКТИЧНА 4 5
+        static void OperatorsMenu(StudentGroup group)
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ПЕРЕВАНТАЖЕННЯ ОПЕРАТОРІВ ===");
+                Console.WriteLine("1. Порівняти двох студентів");
+                Console.WriteLine("2. Об'єднати дві групи");
+                Console.WriteLine("3. Демонстрація Vector");
+                Console.WriteLine("4. Демонстрація GradePoint");
+                Console.WriteLine("5. Знайти найкращого студента");
+                Console.WriteLine("6. Тестування операторів груп");
+                Console.WriteLine("7. Демонстрація Fraction");
+                Console.WriteLine("0. Вихід");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        CompareStudentsMenu(group);
+                        break;
+
+                    case "2":
+                        MergeGroupsMenu(group);
+                        break;
+
+                    case "3":
+                        VectorDemo();
+                        break;
+
+                    case "4":
+                        GradePointDemo();
+                        break;
+
+                    case "5":
+                        BestStudentDemo(group);
+                        break;
+
+                    case "6":
+                        CompareGroupsDemo(group);
+                        break;
+                    case "7":
+                        FractionDemo();
+                        break;
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Невірний вибір");
+                        break;
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        // К
         static void AddStudent(StudentGroup group)
         {
             try
@@ -499,7 +568,6 @@ class Program
             File.WriteAllText("big_report.txt", report);
             Console.WriteLine("Звіт збережено у файл big_report.txt");
         }
-        // ПРАКТИЧНА ТРИ 4
 
         static void SearchByFragment(StudentGroup group)
         {
@@ -604,6 +672,184 @@ class Program
             string result = analyzer.AnalyzeGroupMood(group);
 
             Console.WriteLine(result);
-        }// КІНЕЦЬ ПРАКТИЧНОЇ 3
+        }
+        static void MergeGroupsMenu(StudentGroup group)
+        {
+            StudentGroup other = new StudentGroup
+            {
+                GroupName = "К-999",
+                Specialty = "Тестова група",
+                Course = 2
+            };
+
+            other.AddStudent(new Student
+            {
+                fullName = "Іваненко Іван Іванович",
+                recordBookNumber = "99999999",
+                personalEmail = "test@test.com",
+                DateOfBirth = new DateTime(2005, 1, 1),
+                EnrollmentDate = DateTime.Now,
+                CourseProgress = 90
+            });
+
+            StudentGroup merged = group + other;
+
+            Console.WriteLine("Групи об'єднано");
+            Console.WriteLine($"Нова кількість студентів: {merged.GroupSize}");
+        }
+        static void VectorDemo()
+        {
+            Vector v1 = new Vector(1, 2, 3);
+            Vector v2 = new Vector(4, 5, 6);
+
+            Console.WriteLine($"v1 = {v1}");
+            Console.WriteLine($"v2 = {v2}");
+
+            Console.WriteLine($"\nv1 + v2 = {v1 + v2}");
+            Console.WriteLine($"v1 - v2 = {v1 - v2}");
+            Console.WriteLine($"v1 * v2 = {v1 * v2}");
+
+            Console.WriteLine($"\nv1 > v2 = {v1 > v2}");
+            Console.WriteLine($"v1 < v2 = {v1 < v2}");
+
+            v1++;
+            Console.WriteLine($"\nПісля v1++ : {v1}");
+
+            v2--;
+            Console.WriteLine($"Після v2-- : {v2}");
+
+            double len = (double)v1;
+
+            Console.WriteLine($"\nДовжина v1 = {len:F2}");
+        }
+        static void BestStudentDemo(StudentGroup group)
+        {
+            Student best = group.BestStudent();
+
+            if (best == null)
+            {
+                Console.WriteLine("У групі немає студентів");
+                return;
+            }
+
+            Console.WriteLine("Найкращий студент:");
+            Console.WriteLine(best.ShowDetailedInfo());
+        }
+        static void CompareGroupsDemo(StudentGroup group)
+        {
+            StudentGroup other = new StudentGroup
+            {
+                GroupName = "К-777",
+                Specialty = "Тест",
+                Course = 1
+            };
+
+            Student s = new Student
+            {
+                fullName = "Петров Петро Петрович",
+                recordBookNumber = "77777777",
+                personalEmail = "petro@test.com",
+                DateOfBirth = new DateTime(2004, 5, 5),
+                EnrollmentDate = DateTime.Now,
+                CourseProgress = 70
+            };
+
+            s.Journal.SetGrade("C#", 60);
+
+            other.AddStudent(s);
+
+            Console.WriteLine($"Середній бал {group.GroupName}: {group.AverageGroupGrade}");
+            Console.WriteLine($"Середній бал {other.GroupName}: {other.AverageGroupGrade}");
+
+            Console.WriteLine();
+
+            Console.WriteLine($"group > other = {group > other}");
+            Console.WriteLine($"group < other = {group < other}");
+            Console.WriteLine($"group >= other = {group >= other}");
+            Console.WriteLine($"group <= other = {group <= other}");
+        }
+        static void CompareStudentsMenu(StudentGroup group)
+        {
+            Console.Write("Номер першого студента: ");
+            string id1 = Console.ReadLine();
+
+            Console.Write("Номер другого студента: ");
+            string id2 = Console.ReadLine();
+
+            Student s1 = group.FindByRecordBook(id1);
+            Student s2 = group.FindByRecordBook(id2);
+
+            if (s1 == null || s2 == null)
+            {
+                Console.WriteLine("Один або обидва студенти не знайдені");
+                return;
+            }
+
+            Console.WriteLine($"Студент 1: {s1.fullName}");
+            Console.WriteLine($"Студент 2: {s2.fullName}");
+
+            Console.WriteLine();
+
+            Console.WriteLine($"s1 > s2 = {s1 > s2}");
+            Console.WriteLine($"s1 < s2 = {s1 < s2}");
+            Console.WriteLine($"s1 == s2 = {s1 == s2}");
+            Console.WriteLine($"s1 != s2 = {s1 != s2}");
+        }
+        static void GradePointDemo()
+        {
+            GradePoint g1 = new GradePoint(7.5);
+            GradePoint g2 = new GradePoint(9.2);
+
+            Console.WriteLine($"g1 = {g1}");
+            Console.WriteLine($"g2 = {g2}");
+
+            Console.WriteLine($"g1 + g2 = {g1 + g2}");
+
+            g1++;
+            Console.WriteLine($"g1++ = {g1}");
+
+            g2--;
+            Console.WriteLine($"g2-- = {g2}");
+
+            Console.WriteLine($"g1 > g2 = {g1 > g2}");
+            Console.WriteLine($"g1 < g2 = {g1 < g2}");
+
+            if (g2)
+                Console.WriteLine("g2 >= 8 (true)");
+            else
+                Console.WriteLine("g2 < 8 (false)");
+
+            double val = g1;
+            Console.WriteLine($"неявне double: {val}");
+        }
+        static void FractionDemo()
+        {
+            Fraction f1 = new Fraction(2, 4);
+            Fraction f2 = new Fraction(1, 3);
+
+            Console.WriteLine($"f1 = {f1}");
+            Console.WriteLine($"f2 = {f2}");
+
+            Console.WriteLine($"\nf1 + f2 = {f1 + f2}");
+            Console.WriteLine($"f1 - f2 = {f1 - f2}");
+            Console.WriteLine($"f1 * f2 = {f1 * f2}");
+            Console.WriteLine($"f1 / f2 = {f1 / f2}");
+
+            Console.WriteLine($"\nf1 > f2 = {f1 > f2}");
+            Console.WriteLine($"f1 < f2 = {f1 < f2}");
+            Console.WriteLine($"f1 == f2 = {f1 == f2}");
+            Console.WriteLine($"f1 != f2 = {f1 != f2}");
+
+            f1++;
+            Console.WriteLine($"\nПісля f1++ = {f1}");
+
+            f2--;
+            Console.WriteLine($"Після f2-- = {f2}");
+
+            double value = f1;
+
+            Console.WriteLine($"\nНеявне приведення до double = {value}");
+        }
+        // КІНЕЦЬ ПРАКТИЧНОЇ 3
     }
 }
