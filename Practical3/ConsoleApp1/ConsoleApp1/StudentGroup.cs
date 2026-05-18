@@ -10,53 +10,114 @@ namespace ConsoleApp1
 {
     public class StudentGroup
     {
-        //ліст
         private List<Student> _students = new();
-
         public string GroupName { get; set; }
         public string Specialty { get; set; }
         public int Course { get; set; }
-        //властивості
         public int GroupSize => _students.Count;
-        //властивість для середнього балу групи
-        public double AverageGroupGrade =>
-            _students.Count == 0 ? 0 : Math.Round(_students.Average(s => s.averageGrade), 2);
+        public double AverageGroupGrade => _students.Count == 0 ? 0 : Math.Round(_students.Average(s => s.averageGrade), 2);
         private PortMatrix portMatrix = new();
-
         private PortLogger logger = new();
-
-        //додавання та видалення студентів
         public void AddStudent(Student s)
         {
             if (_students.Any(x => x.recordBookNumber == s.recordBookNumber))
                 throw new Exception("Студент з таким номером вже існує!");
-
             _students.Add(s);
         }
         public void RemoveStudent(string recordBookNumber)
         {
             _students.RemoveAll(s => s.recordBookNumber == recordBookNumber);
         }
-
-        //пошук студентів за ПІБ та номером залікової
         public List<Student> FindByName(string query)
         {
             return _students
-                .Where(s => s.fullName.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .Where(s => s.fullName.Contains(
+                    query,
+                    StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
-
+        // ПРАКТИЧНА ТРИ 1
+        public string SearchByNameFragment(string fragment)
+        {
+            StringBuilder sb = new StringBuilder();
+            var foundStudents = _students
+                .Where(s => s.fullName.Contains(
+                    fragment,
+                    StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (foundStudents.Count == 0)
+            {
+                return "Студентів не знайдено.";
+            }
+            sb.AppendLine("=== РЕЗУЛЬТАТ ПОШУКУ ===");
+            foreach (var student in foundStudents)
+            {
+                sb.AppendLine(student.ShowDetailedInfo());
+            }
+            return sb.ToString();
+        }
+        // кінцева практика 3
+        // ПРАКТИКА ТРИ 1
+        public string ExportToCsv()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("FullName;RecordBookNumber;Email;AverageGrade;Status");
+            foreach (var student in _students)
+            {
+                sb.AppendLine(
+                    $"{student.fullName};" +
+                    $"{student.recordBookNumber};" +
+                    $"{student.personalEmail};" +
+                    $"{student.averageGrade};" +
+                    $"{student.Status}"
+                );
+            }
+            return sb.ToString();
+        }
+        // кінцева практика 3
+        // ПРАКТИЧНА ТРИ 1
+        public void ImportStudentsFromText(string rawText)
+        {
+            if (string.IsNullOrWhiteSpace(rawText))
+            {
+                throw new ArgumentException(
+                    "Текст для імпорту порожній."
+                );
+            }
+            string[] lines = rawText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            foreach (string line in lines)
+            {
+                string cleanedLine = line.Trim();
+                string[] parts = cleanedLine.Split(';');
+                if (parts.Length < 3)
+                {
+                    continue;
+                }
+                try
+                {
+                    Student student = new Student
+                    {
+                        fullName = parts[0].Trim(),
+                        recordBookNumber = parts[1].Trim(),
+                        personalEmail = parts[2].Trim(),
+                        DateOfBirth = DateTime.Now.AddYears(-18),
+                        EnrollmentDate = DateTime.Now
+                    };
+                    AddStudent(student);
+                }
+                catch
+                {
+                    // пропускаємо некоректний запис
+                }
+            }
+        }
+        // кінцева практика 3
         public Student FindByRecordBook(string recordBookNumber)
         {
             return _students.FirstOrDefault(s => s.recordBookNumber == recordBookNumber);
         }
-        //отримання списку відмінників та студентів за статусом
-        public List<Student> GetExcellentStudents() =>
-            _students.Where(s => s.IsExcellent()).ToList();
-
-        public List<Student> GetStudentsByStatus(StudentStatus status) =>
-            _students.Where(s => s.Status == status).ToList();
-        //збереження та завантаження групи у файл
+        public List<Student> GetExcellentStudents() => _students.Where(s => s.IsExcellent()).ToList();
+        public List<Student> GetStudentsByStatus(StudentStatus status) => _students.Where(s => s.Status == status).ToList();
         public void SaveToFile(string path)
         {
             var data = new GroupDto
@@ -66,23 +127,19 @@ namespace ConsoleApp1
                 Course = Course,
                 Students = _students
             };
-
             File.WriteAllText(path, JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }));
             Console.WriteLine("Групу збережено у файл.");
         }
         public void LoadFromFile(string path)
         {
             if (!File.Exists(path)) return;
-
             var data = JsonSerializer.Deserialize<GroupDto>(File.ReadAllText(path));
-
             GroupName = data.GroupName;
             Specialty = data.Specialty;
             Course = data.Course;
             _students = data.Students ?? new();
             Console.WriteLine("Групу завантажено з файлу.");
         }
-        //внутрішній клас для серіалізації
         private class GroupDto
         {
             public string GroupName { get; set; }
@@ -90,14 +147,11 @@ namespace ConsoleApp1
             public int Course { get; set; }
             public List<Student> Students { get; set; }
         }
-        // практична 2
         public void AssignStudentToPort(Student s, int row, int col)
         {
             Port port = portMatrix.GetPort(row, col);
-
             s.PortRow = row;
             s.PortCol = col;
-
             logger.LogOperation(
                 "ASSIGN",
                 port.PortNumber,
@@ -119,9 +173,7 @@ namespace ConsoleApp1
             {
                 throw new Exception("Студент не прив'язаний до порту!");
             }
-
             Port port = portMatrix.GetPort(student.PortRow, student.PortCol);
-
             if (!port.IsOpen)
             {
                 port.Open();
@@ -132,9 +184,7 @@ namespace ConsoleApp1
                     "Порт відкрито автоматично"
                 );
             }
-
             student.AddLabGrade(labNumber, grade);
-
             port.WriteData(data);
 
             logger.LogOperation(
@@ -163,7 +213,6 @@ namespace ConsoleApp1
                         count++;
                 }
             }
-
             return count;
         }
         public Student FindById(int id)
@@ -173,9 +222,7 @@ namespace ConsoleApp1
         public string GenerateBigReport()
         {
             StringBuilder sb = new StringBuilder();
-
             sb.AppendLine("=== ВЕЛИКИЙ ЗВІТ ===");
-
             for (int i = 0; i < 100; i++)
             {
                 foreach (var student in _students)
@@ -188,8 +235,11 @@ namespace ConsoleApp1
                     );
                 }
             }
-
             return sb.ToString();
+        }
+        public List<Student> GetAllStudents()
+        {
+            return _students;
         }
     }
 }
