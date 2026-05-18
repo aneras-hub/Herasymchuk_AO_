@@ -19,12 +19,15 @@ namespace ConsoleApp1
         public string Notes { get; set; } = "Немає нотаток";
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
+        // ПРАКТИЧНА 4 3
+        public List<GradePoint> GradePoints { get; set; } = new();
+        //k
         public byte[] LabGrades { get; set; } = new byte[10];
         public int PortRow { get; set; } = -1;
         public int PortCol { get; set; } = -1;
+        // ПРАКТИЧНА 4 1
         private int courseProgress;
-
-        // ПРАКТИЧНА ТРИ 1
+        // К
         public required string fullName
         {
             get => FullName;
@@ -48,7 +51,6 @@ namespace ConsoleApp1
                 FullName = normalized;
             }
         }
-        // к
         public string recordBookNumber
         {
             get => RecordBookNumber;
@@ -87,7 +89,6 @@ namespace ConsoleApp1
         }
         public double averageGrade => Math.Round(Journal.GetAverage(), 2);
         public double AverageLabGrade => Math.Round(GetAverageLabGrade(), 2);
-        //ПРАКТИЧНА ТРИ 1
         public string GetFormattedInfo(bool detailed = false)
         {
             StringBuilder sb = new StringBuilder();
@@ -98,6 +99,7 @@ namespace ConsoleApp1
             sb.AppendLine($"Залікова книжка: {recordBookNumber}");
             sb.AppendLine($"Середній бал: {averageGrade}");
             sb.AppendLine($"Статус: {Status}");
+            sb.AppendLine($"Прогрес навчання: {CourseProgress}%");
             if (detailed)
             {
                 sb.AppendLine($"Дата народження: {DateOfBirth:d}");
@@ -118,8 +120,6 @@ namespace ConsoleApp1
             }
             return sb.ToString();
         }
-        // к
-        //ПРАКТИЧНА ТРИ 1
         public bool ContainsKeyword(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
@@ -139,10 +139,8 @@ namespace ConsoleApp1
         {
             return GetFormattedInfo(true);
         }
-        //К
         public bool IsExcellent() => averageGrade >= 90;
         public bool IsFailing() => averageGrade < 60;
-
         public int CalculateAge()
         {
             var today = DateTime.Today;
@@ -150,7 +148,6 @@ namespace ConsoleApp1
             if (DateOfBirth.Date > today.AddYears(-age)) age--;
             return age;
         }
-
         public int GetYearsToGraduation()
         {
             int graduationYear = EnrollmentDate.Year + 4;
@@ -186,9 +183,11 @@ namespace ConsoleApp1
                 Journal = this.Journal,
                 LabGrades = (byte[])this.LabGrades.Clone(),
                 PortRow = this.PortRow,
-                PortCol = this.PortCol
+                PortCol = this.PortCol,
+                CourseProgress = this.CourseProgress
             };
         }
+        // ПРАКТИЧНА 4 1
         public int CourseProgress
         {
             get => courseProgress;
@@ -304,6 +303,8 @@ namespace ConsoleApp1
             return merged;
         }
         // К
-
+        // ПРАКТИЧНА 4 3
+        public double AverageGradePoint => GradePoints.Count == 0 ? 0 : GradePoints.Average(g => g.Value);
     }
+    //К
 }
