@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
+    // ПРАКТИЧНА 5 4
     public sealed class GraduateStudent : Student
     {
         public string ThesisTopic { get; set; }
@@ -33,4 +34,5 @@ namespace ConsoleApp1
                    $"Науковий керівник: {ScientificAdvisor}\n";
         }
     }
+    //К
 }

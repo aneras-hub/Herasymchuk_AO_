@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
+    // ПРАКТИЧНА 5 4
     public class WorkingStudent : Student
     {
         public string Workplace { get; set; }
@@ -33,4 +34,5 @@ namespace ConsoleApp1
                    $"Годин роботи на тиждень: {WorkingHoursPerWeek}\n";
         }
     }
+    //К
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
+    // ПРАКТИЧНА 5 4
     public class ExcellentStudent : Student
     {
         public int OlympiadCount { get; set; }
@@ -33,4 +34,5 @@ namespace ConsoleApp1
                    $"Іменна стипендія: {(HasPersonalScholarship ? "Так" : "Ні")}\n";
         }
     }
+    // К
 }

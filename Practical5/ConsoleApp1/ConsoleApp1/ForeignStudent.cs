@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
+    // ПРАКТИЧНА 5 4
     public class ForeignStudent : Student
     {
         public string Country { get; set; }
@@ -33,4 +34,5 @@ namespace ConsoleApp1
                    $"Номер візи: {VisaNumber}\n";
         }
     }
+    // К
 }
