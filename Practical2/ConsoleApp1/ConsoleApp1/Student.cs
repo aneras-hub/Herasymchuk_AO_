@@ -9,18 +9,20 @@ namespace ConsoleApp1
 {
     public enum StudentStatus { Active, AcademicLeave, Expelled, Graduated }
 
-    public class Student
+    public class Student : ICloneable
     {
         private string FullName;
         private string RecordBookNumber;
-        private double AverageGrade;
         private string PersonalEmail;
         public DateTime DateOfBirth { get; set; }
         public DateTime EnrollmentDate { get; set; }
         public string Notes { get; set; } = "Немає нотаток";
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
+        // практична 2
+        // масив для зберігання оцінок за лабораторні роботи (макс 10 лаб)
         public byte[] LabGrades { get; set; } = new byte[10];
+        // координати для виведення в табличному форматі (ряд та стовпець)
         public int PortRow { get; set; } = -1;
         public int PortCol { get; set; } = -1;
         public required string fullName
@@ -42,16 +44,6 @@ namespace ConsoleApp1
                 if (value?.Length != 8 || !long.TryParse(value, out _))
                     throw new ArgumentException("Номер залікової книжки має бути унікальним 8-значним числом.");
                 RecordBookNumber = value;
-            }
-        }
-        public double averageGrade
-        {
-            get => AverageGrade;
-            private set
-            {
-                if (value < 0 || value > 100)
-                    throw new ArgumentOutOfRangeException("Середній бал має бути від 0 до 100.");
-                AverageGrade = Math.Round(value, 2);
             }
         }
         public int Age
@@ -80,24 +72,34 @@ namespace ConsoleApp1
                 }
             }
         }
-        public void SetManualGrade(double grade)
-        {
-            averageGrade = grade;
-        }
+        public double averageGrade => Math.Round(Journal.GetAverage(), 2);
+        public double AverageLabGrade => Math.Round(GetAverageLabGrade(), 2);
+
         public string ShowDetailedInfo()
         {
-            return $"--- Картка студента ---\n" +
-                   $"ПІБ: {fullName}\n" +
-                   $"Вік: {Age} років\n" +
-                   $"Залікова: {recordBookNumber}\n" +
-                   $"Середній бал: {averageGrade}\n" +
-                   $"Статус: {Status}\n" +
-                   $"Email: {personalEmail}\n" +
-                   $"Нотатки: {Notes}\n";
-        }
-        public void UpdateAverageGrade(double newGrade)
-        {
-            averageGrade = newGrade;
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("--- Картка студента ---");
+            sb.AppendLine($"ПІБ: {fullName}");
+            sb.AppendLine($"Вік: {Age} років");
+            sb.AppendLine($"Залікова: {recordBookNumber}");
+            sb.AppendLine($"Середній бал: {averageGrade}");
+            sb.AppendLine($"Оцінки за лабораторні: {string.Join(", ", LabGrades)}");
+            sb.AppendLine($"Середній бал лабораторних: {AverageLabGrade}");
+            sb.AppendLine($"Статус: {Status}");
+            sb.AppendLine($"Email: {personalEmail}");
+            sb.AppendLine($"Нотатки: {Notes}");
+
+            if (PortRow != -1 && PortCol != -1)
+            {
+                sb.AppendLine($"Порт: [{PortRow}, {PortCol}]");
+            }
+            else
+            {
+                sb.AppendLine("Порт не призначено");
+            }
+
+            return sb.ToString();
         }
 
         public bool IsExcellent() => averageGrade >= 90;
@@ -129,5 +131,25 @@ namespace ConsoleApp1
         }
         public double GetAverageLabGrade() =>
             LabGrades.Any(g => g > 0) ? LabGrades.Where(g => g > 0).Average(g => (int)g) : 0;
+        public void SortLabGrades()
+        {
+            Array.Sort(LabGrades);
+        }
+        public object Clone()
+        {
+            return new Student
+            {
+                fullName = this.fullName,
+                recordBookNumber = this.recordBookNumber,
+                personalEmail = this.personalEmail,
+                DateOfBirth = this.DateOfBirth,
+                EnrollmentDate = this.EnrollmentDate,
+                Notes = this.Notes,
+                Journal = this.Journal,
+                LabGrades = (byte[])this.LabGrades.Clone(),
+                PortRow = this.PortRow,
+                PortCol = this.PortCol
+            };
+        }
     }
 }
