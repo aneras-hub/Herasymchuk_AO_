@@ -109,6 +109,7 @@ namespace ConsoleApp1
             for (int i = 0; i < iterations; i++)
             {
                 text += i;
+
             }
             swString.Stop();
             Stopwatch swBuilder = new Stopwatch();
