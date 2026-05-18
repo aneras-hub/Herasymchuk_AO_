@@ -241,5 +241,42 @@ namespace ConsoleApp1
         {
             return _students;
         }
+        public static StudentGroup operator +(StudentGroup a, StudentGroup b)
+        {
+            StudentGroup merged = new StudentGroup
+            {
+                GroupName = $"{a.GroupName}-{b.GroupName}",
+                Specialty = a.Specialty,
+                Course = Math.Max(a.Course, b.Course)
+            };
+
+            foreach (var student in a._students)
+            {
+                merged.AddStudent((Student)student.Clone());
+            }
+
+            foreach (var student in b._students)
+            {
+                if (!merged._students.Any(s =>
+                    s.recordBookNumber == student.recordBookNumber))
+                {
+                    merged.AddStudent((Student)student.Clone());
+                }
+            }
+
+            return merged;
+        }
+
+        // Індексатор
+        public Student this[string recordBookNumber]
+        {
+            get
+            {
+                return _students.FirstOrDefault(s => s.recordBookNumber == recordBookNumber);
+            }
+        }
+
+        // К
+
     }
 }
