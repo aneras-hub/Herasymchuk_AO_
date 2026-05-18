@@ -9,8 +9,10 @@ namespace ConsoleApp1
 {
     public enum StudentStatus { Active, AcademicLeave, Expelled, Graduated }
     // ПРАКТИЧНА 5 1
-    public class Student : Person, ICloneable
+    // ПРАКТИЧНА 5 5
+    public class Student : UniversityMember, ICloneable
     // К
+    //К
     {
         public DateTime EnrollmentDate { get; set; }
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
@@ -146,6 +148,21 @@ namespace ConsoleApp1
                    $"Дата вступу: {EnrollmentDate:d}\n" +
                    $"Середній бал: {averageGrade}\n" +
                    $"Статус: {Status}\n";
+        }
+        //К
+        // ПРАКТИЧНА 5 5
+        public override decimal CalculateScholarship()
+        {
+            if (averageGrade >= 90)
+                return 3000;
+
+            if (averageGrade >= 75)
+                return 2000;
+
+            if (averageGrade >= 60)
+                return 1000;
+
+            return 0;
         }
         //К
         public bool IsExcellent() => averageGrade >= 90;
