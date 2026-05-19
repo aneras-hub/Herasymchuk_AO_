@@ -9,7 +9,6 @@ using ConsoleApp1.порти;
 using ConsoleApp1.студенти;
 using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.практична_6.абстракція;
-using ConsoleApp1.практична_7.структури;
 using ConsoleApp1.практична_7;
 
 namespace ConsoleApp1
