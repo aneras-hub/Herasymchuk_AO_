@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ConsoleApp1.студенти;
 using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_6;
+using System.Text.Json.Serialization;
 
 namespace ConsoleApp1
 {
@@ -17,6 +18,7 @@ namespace ConsoleApp1
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
         public List<GradePoint> GradePoints { get; set; } = new();
+        [JsonIgnore]
         public List<Shape> Shapes { get; set; } = new();
         public byte[] LabGrades { get; set; } = new byte[10];
         public int PortRow { get; set; } = -1;

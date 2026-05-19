@@ -3,6 +3,12 @@ using System.Text;
 using System.Linq;
 using ConsoleApp1;
 using System.IO;
+using ConsoleApp1.студенти;
+using ConsoleApp1.порти;
+using ConsoleApp1.машинки;
+using ConsoleApp1.практична_6.абстракція;
+using ConsoleApp1.практична_6;
+using ConsoleApp1.практична_6.інтерфейс;
 class Program
 {
     static void Main()
@@ -26,6 +32,7 @@ class Program
         Console.WriteLine("3. Перевантаження операторів");
         Console.WriteLine("4. Наслідування та поліморфізм");
         Console.WriteLine("5. Транспортні засоби");
+        Console.WriteLine("6. Поліморфізм фігур");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -38,6 +45,7 @@ class Program
             Console.WriteLine("3. Перевантаження операторів");
             Console.WriteLine("4. Наслідування та поліморфізм");
             Console.WriteLine("5. Транспортні засоби");
+            Console.WriteLine("6. Поліморфізм фігур");
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -59,6 +67,9 @@ class Program
                     break;
                 case "5":
                     VehicleMenu(vehicles);
+                    break;
+                case "6":
+                    ShapesMenu(group);
                     break;
                 case "0":
                     return;
@@ -308,6 +319,68 @@ class Program
 
                     case "5":
                         Console.WriteLine($"Загальна вартість обслуговування: {vehicles.Sum(v => v.CalculateServiceCost())} грн");
+                        break;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Невірний вибір");
+                        break;
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        static void ShapesMenu(StudentGroup group)
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ПРАКТИЧНА 6: ПОЛІМОРФІЗМ ФІГУР ===");
+                Console.WriteLine("1. Додати нову фігуру");
+                Console.WriteLine("2. Вивести всі фігури");
+                Console.WriteLine("3. Розрахувати загальну площу всіх фігур");
+                Console.WriteLine("4. Змінити розмір всіх фігур");
+                Console.WriteLine("5. Намалювати всі фігури");
+                Console.WriteLine("6. Показати інформацію через IPrintable");
+                Console.WriteLine("7. Демонстрація динамічного зв’язування");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddShapeToStudent(group);
+                        break;
+
+                    case "2":
+                        ShowAllShapes(group);
+                        break;
+
+                    case "3":
+                        Console.WriteLine($"Загальна площа: {group.GetTotalAreaOfAllShapes():F2}");
+                        break;
+
+                    case "4":
+                        double factor = ReadDouble("Коефіцієнт зміни розміру: ");
+                        group.ResizeAllShapes(factor);
+                        Console.WriteLine("Розмір усіх фігур змінено.");
+                        break;
+
+                    case "5":
+                        group.DrawAllShapes();
+                        break;
+
+                    case "6":
+                        ShowPrintableInfo(group);
+                        break;
+
+                    case "7":
+                        PolymorphismDemo(group);
                         break;
 
                     case "0":
@@ -1083,6 +1156,147 @@ class Program
             member.Enroll();
 
             Console.WriteLine($"Стипендія: {member.CalculateScholarship()} грн");
+        }
+        static void PolymorphismDemo(StudentGroup group)
+        {
+            Student student = new Student(
+                "Іваненко Іван Іванович",
+                new DateTime(2005, 1, 1),
+                "ivanenko@test.com",
+                DateTime.Now,
+                "12345678",
+                "Студент має діаграми"
+            );
+
+            student.Shapes.Add(new Circle("Коло проєкту", "Червоний", 5));
+            student.Shapes.Add(new Rectangle("Прямокутна діаграма", "Синій", 4, 6));
+            student.Shapes.Add(new Triangle("Трикутна схема", "Зелений", 3, 4, 5));
+            student.Shapes.Add(new Square("Квадратна модель", "Жовтий", 4));
+
+            group.AddStudent(student);
+
+            Console.WriteLine("=== ПОЛІМОРФНА КОЛЕКЦІЯ ФІГУР ===");
+
+            foreach (Shape shape in student.Shapes)
+            {
+                Console.WriteLine(shape.GetDescription());
+                Console.WriteLine("--------------------");
+            }
+
+            Console.WriteLine($"Загальна площа всіх фігур: {group.GetTotalAreaOfAllShapes():F2}");
+
+            Console.WriteLine("\nМалювання всіх фігур:");
+            group.DrawAllShapes();
+
+            Console.WriteLine("\nЗбільшення всіх фігур у 2 рази:");
+            group.ResizeAllShapes(2);
+
+            foreach (Shape shape in student.Shapes)
+            {
+                Console.WriteLine(shape.GetDescription());
+                Console.WriteLine("--------------------");
+            }
+        }
+        static void AddShapeToStudent(StudentGroup group)
+        {
+            Console.Write("Номер залікової книжки студента: ");
+            string record = Console.ReadLine();
+
+            Student student = group.FindByRecordBook(record);
+
+            if (student == null)
+            {
+                Console.WriteLine("Студента не знайдено.");
+                return;
+            }
+
+            Console.WriteLine("Оберіть фігуру:");
+            Console.WriteLine("1. Circle");
+            Console.WriteLine("2. Rectangle");
+            Console.WriteLine("3. Triangle");
+            Console.WriteLine("4. Square");
+
+            string choice = Console.ReadLine();
+
+            string name = Read("Назва фігури: ");
+            string color = Read("Колір: ");
+
+            switch (choice)
+            {
+                case "1":
+                    double radius = ReadDouble("Радіус: ");
+                    student.Shapes.Add(new Circle(name, color, radius));
+                    break;
+
+                case "2":
+                    double width = ReadDouble("Ширина: ");
+                    double height = ReadDouble("Висота: ");
+                    student.Shapes.Add(new Rectangle(name, color, width, height));
+                    break;
+
+                case "3":
+                    double a = ReadDouble("Сторона A: ");
+                    double b = ReadDouble("Сторона B: ");
+                    double c = ReadDouble("Сторона C: ");
+                    student.Shapes.Add(new Triangle(name, color, a, b, c));
+                    break;
+
+                case "4":
+                    double side = ReadDouble("Сторона: ");
+                    student.Shapes.Add(new Square(name, color, side));
+                    break;
+
+                default:
+                    Console.WriteLine("Невірний вибір фігури.");
+                    return;
+            }
+
+            Console.WriteLine("Фігуру додано студенту.");
+        }
+        static void ShowAllShapes(StudentGroup group)
+        {
+            foreach (Student student in group.GetAllStudents())
+            {
+                Console.WriteLine($"Студент: {student.FullName}");
+
+                if (student.Shapes.Count == 0)
+                {
+                    Console.WriteLine("Фігур немає.");
+                    continue;
+                }
+
+                foreach (Shape shape in student.Shapes)
+                {
+                    Console.WriteLine(shape.GetDescription());
+                    Console.WriteLine("--------------------");
+                }
+            }
+        }
+        static void ShowPrintableInfo(StudentGroup group)
+        {
+            foreach (Student student in group.GetAllStudents())
+            {
+                foreach (Shape shape in student.Shapes)
+                {
+                    if (shape is IPrintable printable)
+                    {
+                        Console.WriteLine(printable.GetPrintInfo());
+                        Console.WriteLine("--------------------");
+                    }
+                }
+            }
+        }
+        static double ReadDouble(string msg)
+        {
+            while (true)
+            {
+                Console.Write(msg);
+
+                if (double.TryParse(Console.ReadLine(), out double value))
+                    return value;
+
+                Console.WriteLine("Невірне число.");
+            }
         }
     }
 }
