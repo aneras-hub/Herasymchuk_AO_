@@ -36,5 +36,17 @@ namespace ConsoleApp1.практична_6.абстракція
                 $"Площа: {CalculateArea():F2}\n" +
                 $"Периметр: {CalculatePerimeter():F2}";
         }
+        public void Resize(double factor)
+        {
+            Side *= factor;
+        }
+        public void Draw()
+        {
+            Console.WriteLine($"Малювання квадрата {Name}");
+        }
+        public string GetPrintInfo()
+        {
+            return GetDescription();
+        }
     }
 }

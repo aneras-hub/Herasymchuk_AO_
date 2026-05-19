@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConsoleApp1.практична_6.інтерфейс;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1.практична_6.абстракція
 {
-    public class Circle : Shape
+    public class Circle : Shape, IResizable, IDrawable, IPrintable
     {
         public double Radius { get; set; }
 
@@ -35,6 +36,20 @@ namespace ConsoleApp1.практична_6.абстракція
                 $"Радіус: {Radius}\n" +
                 $"Площа: {CalculateArea():F2}\n" +
                 $"Периметр: {CalculatePerimeter():F2}";
+        }
+        public void Resize(double factor)
+        {
+            Radius *= factor;
+        }
+
+        public void Draw()
+        {
+            Console.WriteLine($"Малювання кола {Name}");
+        }
+
+        public string GetPrintInfo()
+        {
+            return GetDescription();
         }
     }
 }
