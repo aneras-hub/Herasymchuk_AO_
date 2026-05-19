@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.IO;
 using ConsoleApp1.порти;
 using ConsoleApp1.студенти;
+using ConsoleApp1.практична_6.інтерфейс;
+using ConsoleApp1.практична_6.абстракція;
 
 namespace ConsoleApp1
 {
@@ -343,5 +345,33 @@ namespace ConsoleApp1
             return a.AverageGroupGrade <= b.AverageGroupGrade;
         }
         //К
+        public double GetTotalAreaOfAllShapes()
+        {
+            return _students
+                .SelectMany(student => student.Shapes)
+                .Sum(shape => shape.CalculateArea());
+        }
+
+        public void DrawAllShapes()
+        {
+            foreach (var shape in _students.SelectMany(student => student.Shapes))
+            {
+                if (shape is IDrawable drawable)
+                {
+                    drawable.Draw();
+                }
+            }
+        }
+
+        public void ResizeAllShapes(double factor)
+        {
+            foreach (var shape in _students.SelectMany(student => student.Shapes))
+            {
+                if (shape is IResizable resizable)
+                {
+                    resizable.Resize(factor);
+                }
+            }
+        }
     }
 }
