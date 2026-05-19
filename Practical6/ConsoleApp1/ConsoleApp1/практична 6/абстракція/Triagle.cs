@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConsoleApp1.практична_6.інтерфейс;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1.практична_6.абстракція
 {
-    public class Triangle : Shape
+    public class Triangle : Shape, IResizable, IDrawable, IPrintable
     {
         public double SideA { get; set; }
         public double SideB { get; set; }
@@ -51,6 +52,21 @@ namespace ConsoleApp1.практична_6.абстракція
                 $"Сторони: {SideA}, {SideB}, {SideC}\n" +
                 $"Площа: {CalculateArea():F2}\n" +
                 $"Периметр: {CalculatePerimeter():F2}";
+        }
+        public void Resize(double factor)
+        {
+            SideA *= factor;
+            SideB *= factor;
+            SideC *= factor;
+        }
+        public void Draw()
+        {
+            Console.WriteLine($"Малювання трикутника {Name}");
+        }
+
+        public string GetPrintInfo()
+        {
+            return GetDescription();
         }
     }
 }
