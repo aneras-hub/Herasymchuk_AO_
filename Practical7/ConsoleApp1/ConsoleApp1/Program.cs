@@ -523,42 +523,47 @@ class Program
                 Console.Clear();
 
                 Console.WriteLine("=== ПРАКТИЧНА 7: СТРУКТУРИ ===");
-                Console.WriteLine("38. Продемонструвати роботу зі структурами");
-                Console.WriteLine("39. Порівняти продуктивність struct vs class");
-                Console.WriteLine("40. Перетворити студента у StudentRecord");
-                Console.WriteLine("41. Показати історію оцінок через структури");
-                Console.WriteLine("42. Тестування Equals та IEquatable<T>");
-                Console.WriteLine("43. Оптимізація зберігання даних групи");
+                Console.WriteLine("1. Продемонструвати роботу зі структурами");
+                Console.WriteLine("2. Порівняти продуктивність struct vs class");
+                Console.WriteLine("3. Перетворити студента у StudentRecord");
+                Console.WriteLine("4. Показати історію оцінок через структури");
+                Console.WriteLine("5. Тестування Equals та IEquatable<T>");
+                Console.WriteLine("6. Оптимізація зберігання даних групи");
+                Console.WriteLine("7. Демонстрація структури Money");
                 Console.WriteLine("0. Назад");
 
                 string choice = Console.ReadLine();
 
                 switch (choice)
                 {
-                    case "38":
+                    case "1":
                         DemoStructures();
                         break;
 
-                    case "39":
+                    case "2":
                         PerformanceTest test = new PerformanceTest();
                         Console.WriteLine(test.Run());
                         break;
 
-                    case "40":
+                    case "3":
                         ShowStudentRecord(group);
                         break;
 
-                    case "41":
+                    case "4":
                         ShowGradeHistory(group);
                         break;
 
-                    case "42":
+                    case "5":
                         TestStructEquals();
                         break;
 
-                    case "43":
+                    case "6":
                         group.OptimizeStorage();
                         Console.WriteLine("Оптимізацію зберігання виконано.");
+                        break;
+
+                    case "7":
+                        MoneyDemo();
                         break;
 
                     case "0":
@@ -573,7 +578,7 @@ class Program
                 Console.ReadKey();
             }
         }
-        // К
+
         static void AddStudent(StudentGroup group)
         {
             try
@@ -908,7 +913,6 @@ class Program
             File.WriteAllText("big_report.txt", report);
             Console.WriteLine("Звіт збережено у файл big_report.txt");
         }
-
         static void SearchByFragment(StudentGroup group)
         {
             Console.Write("Фрагмент ПІБ: ");
@@ -1006,7 +1010,6 @@ class Program
 
             Console.WriteLine("Звіт збережено у файл group_report.txt");
         }
-
         static void AnalyzeMood(StudentGroup group, MoodAnalyzer analyzer)
         {
             string result = analyzer.AnalyzeGroupMood(group);
@@ -1191,7 +1194,6 @@ class Program
 
             Console.WriteLine($"\nНеявне приведення до double = {value}");
         }
-        // КІНЕЦЬ ПРАКТИЧНОЇ 3
         static void AddRegularStudent(StudentGroup group)
         {
             string name = Read("ПІБ: ");
@@ -1207,7 +1209,6 @@ class Program
 
             Console.WriteLine("Звичайного студента додано.");
         }
-
         static void AddExcellentStudent(StudentGroup group)
         {
             string name = Read("ПІБ: ");
@@ -1231,7 +1232,6 @@ class Program
 
             Console.WriteLine("Відмінника додано.");
         }
-
         static void AddForeignStudent(StudentGroup group)
         {
             string name = Read("ПІБ: ");
@@ -1256,7 +1256,6 @@ class Program
 
             Console.WriteLine("Іноземного студента додано.");
         }
-
         static void AddWorkingStudent(StudentGroup group)
         {
             string name = Read("ПІБ: ");
@@ -1281,7 +1280,6 @@ class Program
 
             Console.WriteLine("Працюючого студента додано.");
         }
-
         static void ShowUniversityMembers(StudentGroup group)
         {
             var members = group.GetMembersByType<UniversityMember>();
@@ -1292,12 +1290,10 @@ class Program
                 Console.WriteLine("--------------------");
             }
         }
-
         static void ShowTotalScholarship(StudentGroup group)
         {
             Console.WriteLine($"Загальна сума стипендій: {group.GetTotalScholarship()} грн");
         }
-
         static void ShowMembersByType(StudentGroup group)
         {
             Console.WriteLine("1. Відмінники");
@@ -1315,7 +1311,6 @@ class Program
             else
                 Console.WriteLine("Невірний вибір");
         }
-
         static void TestHierarchy(StudentGroup group)
         {
             UniversityMember member = new ExcellentStudent(
@@ -1566,6 +1561,34 @@ class Program
 
             Console.WriteLine($"HashCode p1: {p1.GetHashCode()}");
             Console.WriteLine($"HashCode p2: {p2.GetHashCode()}");
+        }
+        static void MoneyDemo()
+        {
+            Money m1 = new Money(1500, "UAH");
+            Money m2 = new Money(700, "UAH");
+
+            Money total = m1 + m2;
+            Money diff = m1 - m2;
+
+            Console.WriteLine("=== MONEY DEMO ===");
+
+            Console.WriteLine($"m1 = {m1}");
+            Console.WriteLine($"m2 = {m2}");
+
+            Console.WriteLine($"\nm1 + m2 = {total}");
+            Console.WriteLine($"m1 - m2 = {diff}");
+
+            Console.WriteLine($"\nm1 > m2 = {m1 > m2}");
+            Console.WriteLine($"m1 < m2 = {m1 < m2}");
+
+            Console.WriteLine($"\nm1 == m2 = {m1 == m2}");
+            Console.WriteLine($"m1 != m2 = {m1 != m2}");
+
+            var (amount, currency) = m1;
+
+            Console.WriteLine($"\nDeconstruct:");
+            Console.WriteLine($"Amount = {amount}");
+            Console.WriteLine($"Currency = {currency}");
         }
     }
 }
