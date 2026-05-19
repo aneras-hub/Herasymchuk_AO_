@@ -24,6 +24,7 @@ class Program
         Console.WriteLine("1. Основне меню");
         Console.WriteLine("2. Робота з текстом та звітами");
         Console.WriteLine("3. Перевантаження операторів");
+        Console.WriteLine("4. Наслідування та поліморфізм");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -52,6 +53,9 @@ class Program
                 // ПРАКТИЧНА 4 5
                 case "3":
                     OperatorsMenu(group);
+                    break;
+                case "4":
+                    InheritanceMenu(group);
                     break;
                 // К
                 case "0":
@@ -218,6 +222,43 @@ class Program
                     default:
                         Console.WriteLine("Невірний вибір");
                         break;
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        static void InheritanceMenu(StudentGroup group)
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ПРАКТИЧНА 5: НАСЛІДУВАННЯ ===");
+                Console.WriteLine("1. Додати звичайного студента");
+                Console.WriteLine("2. Додати відмінника");
+                Console.WriteLine("3. Додати іноземного студента");
+                Console.WriteLine("4. Додати працюючого студента");
+                Console.WriteLine("5. Вивести всіх членів університету");
+                Console.WriteLine("6. Розрахувати стипендію для всіх");
+                Console.WriteLine("7. Показати студентів конкретного типу");
+                Console.WriteLine("8. Тестування base/override");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1": AddRegularStudent(group); break;
+                    case "2": AddExcellentStudent(group); break;
+                    case "3": AddForeignStudent(group); break;
+                    case "4": AddWorkingStudent(group); break;
+                    case "5": ShowUniversityMembers(group); break;
+                    case "6": ShowTotalScholarship(group); break;
+                    case "7": ShowMembersByType(group); break;
+                    case "8": TestHierarchy(group); break;
+                    case "0": return;
+                    default: Console.WriteLine("Невірний вибір"); break;
                 }
 
                 Console.WriteLine("\nНатисніть клавішу...");
@@ -850,5 +891,148 @@ class Program
             Console.WriteLine($"\nНеявне приведення до double = {value}");
         }
         // КІНЕЦЬ ПРАКТИЧНОЇ 3
+        static void AddRegularStudent(StudentGroup group)
+        {
+            string name = Read("ПІБ: ");
+            string record = Read("Залікова: ");
+            string email = Read("Email: ");
+            DateTime dob = ReadDate("Дата народження: ");
+            DateTime enroll = ReadDate("Дата вступу: ");
+            string notes = Read("Нотатки: ");
+
+            Student student = new Student(name, dob, email, enroll, record, notes);
+
+            group.AddMember(student);
+
+            Console.WriteLine("Звичайного студента додано.");
+        }
+
+        static void AddExcellentStudent(StudentGroup group)
+        {
+            string name = Read("ПІБ: ");
+            string record = Read("Залікова: ");
+            string email = Read("Email: ");
+            DateTime dob = ReadDate("Дата народження: ");
+            DateTime enroll = ReadDate("Дата вступу: ");
+            int olympiads = ReadInt("Кількість олімпіад: ");
+
+            ExcellentStudent student = new ExcellentStudent(
+                name,
+                dob,
+                email,
+                enroll,
+                record,
+                olympiads,
+                true
+            );
+
+            group.AddMember(student);
+
+            Console.WriteLine("Відмінника додано.");
+        }
+
+        static void AddForeignStudent(StudentGroup group)
+        {
+            string name = Read("ПІБ: ");
+            string record = Read("Залікова: ");
+            string email = Read("Email: ");
+            DateTime dob = ReadDate("Дата народження: ");
+            DateTime enroll = ReadDate("Дата вступу: ");
+            string country = Read("Країна: ");
+            string visa = Read("Номер візи: ");
+
+            ForeignStudent student = new ForeignStudent(
+                name,
+                dob,
+                email,
+                enroll,
+                record,
+                country,
+                visa
+            );
+
+            group.AddMember(student);
+
+            Console.WriteLine("Іноземного студента додано.");
+        }
+
+        static void AddWorkingStudent(StudentGroup group)
+        {
+            string name = Read("ПІБ: ");
+            string record = Read("Залікова: ");
+            string email = Read("Email: ");
+            DateTime dob = ReadDate("Дата народження: ");
+            DateTime enroll = ReadDate("Дата вступу: ");
+            string workplace = Read("Місце роботи: ");
+            int hours = ReadInt("Годин на тиждень: ");
+
+            WorkingStudent student = new WorkingStudent(
+                name,
+                dob,
+                email,
+                enroll,
+                record,
+                workplace,
+                hours
+            );
+
+            group.AddMember(student);
+
+            Console.WriteLine("Працюючого студента додано.");
+        }
+
+        static void ShowUniversityMembers(StudentGroup group)
+        {
+            var members = group.GetMembersByType<UniversityMember>();
+
+            foreach (var member in members)
+            {
+                Console.WriteLine(member.GetInfo());
+                Console.WriteLine("--------------------");
+            }
+        }
+
+        static void ShowTotalScholarship(StudentGroup group)
+        {
+            Console.WriteLine($"Загальна сума стипендій: {group.GetTotalScholarship()} грн");
+        }
+
+        static void ShowMembersByType(StudentGroup group)
+        {
+            Console.WriteLine("1. Відмінники");
+            Console.WriteLine("2. Іноземні студенти");
+            Console.WriteLine("3. Працюючі студенти");
+
+            string choice = Console.ReadLine();
+
+            if (choice == "1")
+                group.GetMembersByType<ExcellentStudent>().ForEach(s => Console.WriteLine(s.GetInfo()));
+            else if (choice == "2")
+                group.GetMembersByType<ForeignStudent>().ForEach(s => Console.WriteLine(s.GetInfo()));
+            else if (choice == "3")
+                group.GetMembersByType<WorkingStudent>().ForEach(s => Console.WriteLine(s.GetInfo()));
+            else
+                Console.WriteLine("Невірний вибір");
+        }
+
+        static void TestHierarchy(StudentGroup group)
+        {
+            UniversityMember member = new ExcellentStudent(
+                "Тестовий Студент Приклад",
+                new DateTime(2005, 1, 1),
+                "test@student.com",
+                DateTime.Now,
+                "12345678",
+                3,
+                true
+            );
+
+            group.AddMember(member);
+
+            Console.WriteLine(member.GetInfo());
+            member.Enroll();
+
+            Console.WriteLine($"Стипендія: {member.CalculateScholarship()} грн");
+        }
     }
 }
