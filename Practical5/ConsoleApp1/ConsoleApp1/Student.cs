@@ -22,46 +22,14 @@ namespace ConsoleApp1
         public int PortRow { get; set; } = -1;
         public int PortCol { get; set; } = -1;
         private int courseProgress;
+        public string RecordBookNumber { get; set; }
         // ПРАКТИЧНА 5 1
         public Student(string fullName, DateTime dateOfBirth, string personalEmail, DateTime enrollmentDate, string recordBookNumber, string notes = "Немає нотаток") : base(fullName, dateOfBirth, personalEmail, notes)
         {
             EnrollmentDate = enrollmentDate;
-            this.recordBookNumber = recordBookNumber;
+            RecordBookNumber = recordBookNumber;
         }
         //К
-        public required string fullName
-        {
-            get => FullName;
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("ПІБ не може бути порожнім.");
-
-                string normalized = value.Trim();
-
-                string[] parts = normalized.Split(
-                    ' ',
-                    StringSplitOptions.RemoveEmptyEntries
-                );
-
-                if (parts.Length < 3)
-                    throw new ArgumentException(
-                        "ПІБ має містити мінімум 3 слова: прізвище, ім'я та по батькові."
-                    );
-
-                FullName = normalized;
-            }
-        }
-        public string recordBookNumber
-        {
-            get => RecordBookNumber;
-            set
-            {
-                if (value?.Length != 8 || !long.TryParse(value, out _))
-                    throw new ArgumentException("Номер залікової книжки має бути унікальним 8-значним числом.");
-                RecordBookNumber = value;
-            }
-        }
         public int Age
         {
             get
@@ -72,22 +40,7 @@ namespace ConsoleApp1
                 return age;
             }
         }
-        public string personalEmail
-        {
-            get => PersonalEmail;
-            set
-            {
-                try
-                {
-                    var addr = new MailAddress(value);
-                    PersonalEmail = addr.Address;
-                }
-                catch
-                {
-                    throw new ArgumentException("Некоректний формат email.");
-                }
-            }
-        }
+        
         public double averageGrade => Math.Round(Journal.GetAverage(), 2);
         public double AverageLabGrade => Math.Round(GetAverageLabGrade(), 2);
         public string GetFormattedInfo(bool detailed = false)
@@ -95,9 +48,9 @@ namespace ConsoleApp1
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("--- Картка студента ---");
-            sb.AppendLine($"ПІБ: {fullName}");
+            sb.AppendLine($"ПІБ: {FullName}");
             sb.AppendLine($"Вік: {Age} років");
-            sb.AppendLine($"Залікова книжка: {recordBookNumber}");
+            sb.AppendLine($"Залікова книжка: {RecordBookNumber}");
             sb.AppendLine($"Середній бал: {averageGrade}");
             sb.AppendLine($"Статус: {Status}");
             sb.AppendLine($"Прогрес навчання: {CourseProgress}%");
@@ -127,10 +80,10 @@ namespace ConsoleApp1
                 return false;
 
             return
-                fullName.Contains(keyword,
+                FullName.Contains(keyword,
                     StringComparison.OrdinalIgnoreCase)
 
-                || personalEmail.Contains(keyword,
+                || PersonalEmail.Contains(keyword,
                     StringComparison.OrdinalIgnoreCase)
 
                 || Notes.Contains(keyword,
@@ -144,7 +97,7 @@ namespace ConsoleApp1
         public override string GetInfo()
         {
             return base.GetInfo() +
-                   $"Залікова книжка: {recordBookNumber}\n" +
+                   $"Залікова книжка: {RecordBookNumber}\n" +
                    $"Дата вступу: {EnrollmentDate:d}\n" +
                    $"Середній бал: {averageGrade}\n" +
                    $"Статус: {Status}\n";
@@ -198,20 +151,22 @@ namespace ConsoleApp1
         }
         public object Clone()
         {
-            return new Student
-            {
-                fullName = this.fullName,
-                recordBookNumber = this.recordBookNumber,
-                personalEmail = this.personalEmail,
-                DateOfBirth = this.DateOfBirth,
-                EnrollmentDate = this.EnrollmentDate,
-                Notes = this.Notes,
-                Journal = this.Journal,
-                LabGrades = (byte[])this.LabGrades.Clone(),
-                PortRow = this.PortRow,
-                PortCol = this.PortCol,
-                CourseProgress = this.CourseProgress
-            };
+            Student copy = new Student(
+                FullName,
+                DateOfBirth,
+                PersonalEmail,
+                EnrollmentDate,
+                RecordBookNumber,
+                Notes
+            );
+
+            copy.Journal = Journal;
+            copy.LabGrades = (byte[])LabGrades.Clone();
+            copy.PortRow = PortRow;
+            copy.PortCol = PortCol;
+            copy.CourseProgress = CourseProgress;
+
+            return copy;
         }
         public int CourseProgress
         {
@@ -292,26 +247,25 @@ namespace ConsoleApp1
                 CourseProgress
             );
         }
+        //ghfrnbxyf 5 5
         public static Student operator +(Student a, Student b)
         {
-            Student merged = new Student
-            {
-                fullName = $"{a.fullName} & {b.fullName}",
-                recordBookNumber = DateTime.Now.Ticks
-                .ToString()
-                .Substring(0, 8),
-                personalEmail = "team@student.com",
-                DateOfBirth = a.DateOfBirth,
-                EnrollmentDate = a.EnrollmentDate,
-                Notes = $"Командний профіль: {a.fullName} + {b.fullName}",
+            Student merged = new Student(
+                $"{a.FullName} & {b.FullName}",
+                a.DateOfBirth,
+                "team@student.com",
+                a.EnrollmentDate,
+                DateTime.Now.Ticks.ToString().Substring(0, 8),
+                $"Командний профіль: {a.FullName} + {b.FullName}"
+            );
 
-                CourseProgress = (a.CourseProgress + b.CourseProgress) / 2,
+            merged.CourseProgress =
+                (a.CourseProgress + b.CourseProgress) / 2;
 
-                LabGrades = a.LabGrades
+            merged.LabGrades = a.LabGrades
                 .Concat(b.LabGrades)
                 .Take(10)
-                .ToArray()
-            };
+                .ToArray();
 
             foreach (var grade in a.Journal.Grades)
             {
@@ -325,11 +279,10 @@ namespace ConsoleApp1
                     merged.Journal.Grades[grade.Key] = grade.Value;
                 }
             }
+
             return merged;
         }
         // К
-        // ПРАКТИЧНА 4 3
         public double AverageGradePoint => GradePoints.Count == 0 ? 0 : GradePoints.Average(g => g.Value);
     }
-    //К
 }

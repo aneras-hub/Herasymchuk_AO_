@@ -90,6 +90,6 @@ namespace ConsoleApp1
 
             return sb.ToString();
         }
-        // К
+
     }
 }
