@@ -8,6 +8,7 @@ using ConsoleApp1.студенти;
 using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_6;
 using System.Text.Json.Serialization;
+using ConsoleApp1.практична_7;
 
 namespace ConsoleApp1
 {
@@ -278,5 +279,14 @@ namespace ConsoleApp1
             return merged;
         }
         public double AverageGradePoint => GradePoints.Count == 0 ? 0 : GradePoints.Average(g => g.Value);
+        public StudentRecord GetRecord()
+        {
+            return new StudentRecord(
+                FullName,
+                RecordBookNumber,
+                averageGrade,
+                CourseProgress
+            );
+        }
     }
 }

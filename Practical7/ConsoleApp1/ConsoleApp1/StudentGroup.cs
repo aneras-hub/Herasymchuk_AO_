@@ -9,6 +9,8 @@ using ConsoleApp1.порти;
 using ConsoleApp1.студенти;
 using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.практична_6.абстракція;
+using ConsoleApp1.практична_7.структури;
+using ConsoleApp1.практична_7;
 
 namespace ConsoleApp1
 {
@@ -23,6 +25,9 @@ namespace ConsoleApp1
         public double AverageGroupGrade => _students.Count == 0 ? 0 : Math.Round(_students.Average(s => s.averageGrade), 2);
         private PortMatrix portMatrix = new();
         private PortLogger logger = new();
+        private GradeRecord[] gradeHistory = Array.Empty<GradeRecord>();
+        private Point[] labPlaces = Array.Empty<Point>();
+        private StudentRecord[] studentRecords = Array.Empty<StudentRecord>();
         // ghfrnbxyf 5 5
         public void AddMember(UniversityMember member)
         {
@@ -370,6 +375,38 @@ namespace ConsoleApp1
                     resizable.Resize(factor);
                 }
             }
+        }
+        public void OptimizeStorage()
+        {
+            studentRecords = GetAllRecords();
+
+            gradeHistory = _students
+                .SelectMany(student => student.Journal.Grades.Select(grade =>
+                    new GradeRecord(
+                        grade.Key,
+                        grade.Value,
+                        DateTime.Now
+                    )))
+                .ToArray();
+
+            labPlaces = _students
+                .Where(student => student.PortRow >= 0 && student.PortCol >= 0)
+                .Select(student => new Point(student.PortRow, student.PortCol))
+                .ToArray();
+        }
+        public StudentRecord[] GetAllRecords()
+        {
+            return _students
+                .Select(student => student.GetRecord())
+                .ToArray();
+        }
+        public GradeRecord[] GetGradeHistory()
+        {
+            return gradeHistory;
+        }
+        public Point[] GetLabPlaces()
+        {
+            return labPlaces;
         }
     }
 }
