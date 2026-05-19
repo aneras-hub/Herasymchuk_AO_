@@ -10,6 +10,7 @@ using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_6;
 using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.індивідуальні_завдання;
+using ConsoleApp1.практична_7;
 class Program
 {
     static void Main()
@@ -36,6 +37,7 @@ class Program
         Console.WriteLine("5. Транспортні засоби");
         Console.WriteLine("6. Поліморфізм фігур");
         Console.WriteLine("7. Ієрархія платежів");
+        Console.WriteLine("8. Робота зі структурами");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -50,6 +52,7 @@ class Program
             Console.WriteLine("5. Транспортні засоби");
             Console.WriteLine("6. Поліморфізм фігур");
             Console.WriteLine("7. Ієрархія платежів");
+            Console.WriteLine("8. Робота зі структурами");
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -77,6 +80,9 @@ class Program
                     break;
                 case "7":
                     PaymentMenu(payments);
+                    break;
+                case "8":
+                    StructuresMenu(group);
                     break;
                 case "0":
                     return;
@@ -503,6 +509,63 @@ class Program
 
                     default:
                         Console.WriteLine("Невірний вибір");
+                        break;
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        static void StructuresMenu(StudentGroup group)
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ПРАКТИЧНА 7: СТРУКТУРИ ===");
+                Console.WriteLine("38. Продемонструвати роботу зі структурами");
+                Console.WriteLine("39. Порівняти продуктивність struct vs class");
+                Console.WriteLine("40. Перетворити студента у StudentRecord");
+                Console.WriteLine("41. Показати історію оцінок через структури");
+                Console.WriteLine("42. Тестування Equals та IEquatable<T>");
+                Console.WriteLine("43. Оптимізація зберігання даних групи");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "38":
+                        DemoStructures();
+                        break;
+
+                    case "39":
+                        PerformanceTest test = new PerformanceTest();
+                        Console.WriteLine(test.Run());
+                        break;
+
+                    case "40":
+                        ShowStudentRecord(group);
+                        break;
+
+                    case "41":
+                        ShowGradeHistory(group);
+                        break;
+
+                    case "42":
+                        TestStructEquals();
+                        break;
+
+                    case "43":
+                        group.OptimizeStorage();
+                        Console.WriteLine("Оптимізацію зберігання виконано.");
+                        break;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Невірний вибір.");
                         break;
                 }
 
@@ -1424,6 +1487,85 @@ class Program
 
                 Console.WriteLine("Невірне число.");
             }
+        }
+        static void DemoStructures()
+        {
+            Point point = new Point(2, 5);
+            GradeRecord grade = new GradeRecord("C#", 95, DateTime.Now);
+            ComplexNumber c1 = new ComplexNumber(3, 4);
+            ComplexNumber c2 = new ComplexNumber(1, 2);
+            ComplexNumber sum = c1 + c2;
+
+            Console.WriteLine("=== ДЕМОНСТРАЦІЯ СТРУКТУР ===");
+            Console.WriteLine(point);
+            Console.WriteLine(grade);
+            Console.WriteLine($"Комплексне число 1: {c1}");
+            Console.WriteLine($"Комплексне число 2: {c2}");
+            Console.WriteLine($"Сума: {sum}");
+
+            var (row, column) = point;
+            Console.WriteLine($"Deconstruct Point: ряд = {row}, стовпець = {column}");
+
+            var (subject, gradeValue, date) = grade;
+            Console.WriteLine($"Deconstruct GradeRecord: {subject}, {gradeValue}, {date:d}");
+        }
+        static void ShowStudentRecord(StudentGroup group)
+        {
+            Console.Write("Номер залікової книжки студента: ");
+            string record = Console.ReadLine();
+
+            Student student = group.FindByRecordBook(record);
+
+            if (student == null)
+            {
+                Console.WriteLine("Студента не знайдено.");
+                return;
+            }
+
+            StudentRecord studentRecord = student.GetRecord();
+
+            Console.WriteLine("=== STUDENT RECORD ===");
+            Console.WriteLine(studentRecord);
+        }
+        static void ShowGradeHistory(StudentGroup group)
+        {
+            group.OptimizeStorage();
+
+            GradeRecord[] history = group.GetGradeHistory();
+
+            if (history.Length == 0)
+            {
+                Console.WriteLine("Історія оцінок порожня.");
+                return;
+            }
+
+            Console.WriteLine("=== ІСТОРІЯ ОЦІНОК ===");
+
+            foreach (GradeRecord record in history)
+            {
+                Console.WriteLine(record);
+            }
+        }
+        static void TestStructEquals()
+        {
+            Point p1 = new Point(1, 2);
+            Point p2 = new Point(1, 2);
+            Point p3 = new Point(3, 4);
+
+            GradeRecord g1 = new GradeRecord("C#", 90, DateTime.Today);
+            GradeRecord g2 = new GradeRecord("C#", 90, DateTime.Today);
+
+            Console.WriteLine("=== ТЕСТУВАННЯ EQUALS ТА IEQUATABLE ===");
+
+            Console.WriteLine($"p1 == p2: {p1 == p2}");
+            Console.WriteLine($"p1 == p3: {p1 == p3}");
+            Console.WriteLine($"p1.Equals(p2): {p1.Equals(p2)}");
+
+            Console.WriteLine($"g1 == g2: {g1 == g2}");
+            Console.WriteLine($"g1.Equals(g2): {g1.Equals(g2)}");
+
+            Console.WriteLine($"HashCode p1: {p1.GetHashCode()}");
+            Console.WriteLine($"HashCode p2: {p2.GetHashCode()}");
         }
     }
 }
