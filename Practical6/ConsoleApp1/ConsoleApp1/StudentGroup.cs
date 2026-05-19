@@ -14,10 +14,8 @@ namespace ConsoleApp1
 {
     public class StudentGroup
     {
-        //ghfrnbxyf 5 5
         private List<UniversityMember> _members = new();
         private List<Student> _students => _members.OfType<Student>().ToList();
-        //r
         public string GroupName { get; set; }
         public string Specialty { get; set; }
         public int Course { get; set; }

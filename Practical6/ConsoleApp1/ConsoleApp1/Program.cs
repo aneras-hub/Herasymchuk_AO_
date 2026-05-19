@@ -3,11 +3,6 @@ using System.Text;
 using System.Linq;
 using ConsoleApp1;
 using System.IO;
-using ConsoleApp1.студенти;
-using ConsoleApp1.порти;
-using ConsoleApp1.машинки;
-using ConsoleApp1.практична_6.абстракція;
-using ConsoleApp1.практична_6;
 class Program
 {
     static void Main()
@@ -1088,46 +1083,6 @@ class Program
             member.Enroll();
 
             Console.WriteLine($"Стипендія: {member.CalculateScholarship()} грн");
-        }
-        static void PolymorphismDemo(StudentGroup group)
-        {
-            Student student = new Student(
-                "Іваненко Іван Іванович",
-                new DateTime(2005, 1, 1),
-                "ivanenko@test.com",
-                DateTime.Now,
-                "12345678",
-                "Студент має діаграми"
-            );
-
-            student.Shapes.Add(new Circle("Коло проєкту", "Червоний", 5));
-            student.Shapes.Add(new Rectangle("Прямокутна діаграма", "Синій", 4, 6));
-            student.Shapes.Add(new Triangle("Трикутна схема", "Зелений", 3, 4, 5));
-            student.Shapes.Add(new Square("Квадратна модель", "Жовтий", 4));
-
-            group.AddStudent(student);
-
-            Console.WriteLine("=== ПОЛІМОРФНА КОЛЕКЦІЯ ФІГУР ===");
-
-            foreach (Shape shape in student.Shapes)
-            {
-                Console.WriteLine(shape.GetDescription());
-                Console.WriteLine("--------------------");
-            }
-
-            Console.WriteLine($"Загальна площа всіх фігур: {group.GetTotalAreaOfAllShapes():F2}");
-
-            Console.WriteLine("\nМалювання всіх фігур:");
-            group.DrawAllShapes();
-
-            Console.WriteLine("\nЗбільшення всіх фігур у 2 рази:");
-            group.ResizeAllShapes(2);
-
-            foreach (Shape shape in student.Shapes)
-            {
-                Console.WriteLine(shape.GetDescription());
-                Console.WriteLine("--------------------");
-            }
         }
     }
 }
