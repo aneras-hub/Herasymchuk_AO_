@@ -10,7 +10,10 @@ namespace ConsoleApp1
 {
     public class StudentGroup
     {
-        private List<Student> _students = new();
+        //ghfrnbxyf 5 5
+        private List<UniversityMember> _members = new();
+        private List<Student> _students => _members.OfType<Student>().ToList();
+        //r
         public string GroupName { get; set; }
         public string Specialty { get; set; }
         public int Course { get; set; }
@@ -18,20 +21,40 @@ namespace ConsoleApp1
         public double AverageGroupGrade => _students.Count == 0 ? 0 : Math.Round(_students.Average(s => s.averageGrade), 2);
         private PortMatrix portMatrix = new();
         private PortLogger logger = new();
+        // ghfrnbxyf 5 5
+        public void AddMember(UniversityMember member)
+        {
+            _members.Add(member);
+        }
+
+        public List<T> GetMembersByType<T>() where T : UniversityMember
+        {
+            return _members.OfType<T>().ToList();
+        }
+
+        public decimal GetTotalScholarship()
+        {
+            return _members.Sum(m => m.CalculateScholarship());
+        }
+        // ghfrnbxyf 5 5 
+        // ghfrnxyf 5 5
         public void AddStudent(Student s)
         {
-            if (_students.Any(x => x.recordBookNumber == s.recordBookNumber))
+            if (_members.OfType<Student>().Any(x => x.RecordBookNumber == s.RecordBookNumber))
                 throw new Exception("Студент з таким номером вже існує!");
-            _students.Add(s);
+
+            _members.Add(s);
+
         }
+        // r
         public void RemoveStudent(string recordBookNumber)
         {
-            _students.RemoveAll(s => s.recordBookNumber == recordBookNumber);
+            _members.RemoveAll(s => s is Student st && st.RecordBookNumber == recordBookNumber);
         }
         public List<Student> FindByName(string query)
         {
             return _students
-                .Where(s => s.fullName.Contains(
+                .Where(s => s.FullName.Contains(
                     query,
                     StringComparison.OrdinalIgnoreCase))
                 .ToList();
@@ -40,7 +63,7 @@ namespace ConsoleApp1
         {
             StringBuilder sb = new StringBuilder();
             var foundStudents = _students
-                .Where(s => s.fullName.Contains(
+                .Where(s => s.FullName.Contains(
                     fragment,
                     StringComparison.OrdinalIgnoreCase))
                 .ToList();
@@ -62,9 +85,9 @@ namespace ConsoleApp1
             foreach (var student in _students)
             {
                 sb.AppendLine(
-                    $"{student.fullName};" +
-                    $"{student.recordBookNumber};" +
-                    $"{student.personalEmail};" +
+                    $"{student.FullName};" +
+                    $"{student.RecordBookNumber};" +
+                    $"{student.PersonalEmail};" +
                     $"{student.averageGrade};" +
                     $"{student.Status}"
                 );
@@ -90,14 +113,13 @@ namespace ConsoleApp1
                 }
                 try
                 {
-                    Student student = new Student
-                    {
-                        fullName = parts[0].Trim(),
-                        recordBookNumber = parts[1].Trim(),
-                        personalEmail = parts[2].Trim(),
-                        DateOfBirth = DateTime.Now.AddYears(-18),
-                        EnrollmentDate = DateTime.Now
-                    };
+                    Student student = new Student(
+                        parts[0].Trim(),
+                        DateTime.Now.AddYears(-18),
+                        parts[2].Trim(),
+                        DateTime.Now,
+                        parts[1].Trim()
+                    );
                     AddStudent(student);
                 }
                 catch
@@ -108,7 +130,7 @@ namespace ConsoleApp1
         }
         public Student FindByRecordBook(string recordBookNumber)
         {
-            return _students.FirstOrDefault(s => s.recordBookNumber == recordBookNumber);
+            return _students.FirstOrDefault(s => s.RecordBookNumber == recordBookNumber);
         }
         public List<Student> GetExcellentStudents() => _students.Where(s => s.IsExcellent()).ToList();
         public List<Student> GetStudentsByStatus(StudentStatus status) => _students.Where(s => s.Status == status).ToList();
@@ -131,7 +153,10 @@ namespace ConsoleApp1
             GroupName = data.GroupName;
             Specialty = data.Specialty;
             Course = data.Course;
-            _students = data.Students ?? new();
+            _members = data.Students?
+                .Cast<UniversityMember>()
+                .ToList()
+                ?? new();
             Console.WriteLine("Групу завантажено з файлу.");
         }
         private class GroupDto
@@ -149,7 +174,7 @@ namespace ConsoleApp1
             logger.LogOperation(
                 "ASSIGN",
                 port.PortNumber,
-                $"Студент {s.fullName} прив'язаний до порту"
+                $"Студент {s.FullName} прив'язаний до порту"
             );
         }
         public List<Student> GetStudentsByPortStatus(bool isOpen)
@@ -184,7 +209,7 @@ namespace ConsoleApp1
             logger.LogOperation(
                 "LAB_WORK",
                 port.PortNumber,
-                $"Студент {student.fullName} виконав лабораторну №{labNumber}, оцінка: {grade}"
+                $"Студент {student.FullName} виконав лабораторну №{labNumber}, оцінка: {grade}"
             );
         }
         public string GetPortLogs()
@@ -211,7 +236,7 @@ namespace ConsoleApp1
         }
         public Student FindById(int id)
         {
-            return _students.FirstOrDefault(s => s.recordBookNumber == id.ToString());
+            return _students.FirstOrDefault(s => s.RecordBookNumber == id.ToString());
         }
         public string GenerateBigReport()
         {
@@ -223,7 +248,7 @@ namespace ConsoleApp1
                 {
                     sb.AppendLine(
                         $"Запис #{i + 1} | " +
-                        $"Студент: {student.fullName} | " +
+                        $"Студент: {student.FullName} | " +
                         $"Середній бал: {student.averageGrade} | " +
                         $"Статус: {student.Status}"
                     );
@@ -253,8 +278,7 @@ namespace ConsoleApp1
 
             foreach (var student in b._students)
             {
-                if (!merged._students.Any(s =>
-                    s.recordBookNumber == student.recordBookNumber))
+                if (!merged._students.Any(s => s.RecordBookNumber == student.RecordBookNumber))
                 {
                     merged.AddStudent((Student)student.Clone());
                 }
@@ -268,7 +292,7 @@ namespace ConsoleApp1
         {
             get
             {
-                return _students.FirstOrDefault(s => s.recordBookNumber == recordBookNumber);
+                return _students.FirstOrDefault(s => s.RecordBookNumber == recordBookNumber);
             }
         }
 
