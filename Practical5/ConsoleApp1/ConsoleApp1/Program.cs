@@ -35,11 +35,9 @@ class Program
             Console.WriteLine($"=== ГРУПА {group.GroupName} ===");
             Console.WriteLine("1. Основне меню");
             Console.WriteLine("2. Робота з текстом та звітами");
-            // ПРАКТИЧНА 4 5
             Console.WriteLine("3. Перевантаження операторів");
             Console.WriteLine("4. Наслідування та поліморфізм");
             Console.WriteLine("5. Транспортні засоби");
-            // К
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -53,7 +51,6 @@ class Program
                 case "2":
                     TextReportsMenu(group, textProcessor, advancedLogger, moodAnalyzer);
                     break;
-                // ПРАКТИЧНА 4 5
                 case "3":
                     OperatorsMenu(group);
                     break;
@@ -63,7 +60,6 @@ class Program
                 case "5":
                     VehicleMenu(vehicles);
                     break;
-                // К
                 case "0":
                     return;
 
@@ -175,7 +171,6 @@ class Program
                 Console.ReadKey();
             }
         }
-        //ПРАКТИЧНА 4 5
         static void OperatorsMenu(StudentGroup group)
         {
             while (true)
@@ -215,7 +210,6 @@ class Program
                     case "5":
                         BestStudentDemo(group);
                         break;
-
                     case "6":
                         CompareGroupsDemo(group);
                         break;
