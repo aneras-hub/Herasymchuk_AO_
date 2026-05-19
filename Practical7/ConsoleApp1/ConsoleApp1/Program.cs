@@ -10,6 +10,7 @@ using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_6;
 using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.індивідуальні_завдання;
+using ConsoleApp1.практична_7.структури;
 class Program
 {
     static void Main()
