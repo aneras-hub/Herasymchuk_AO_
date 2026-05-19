@@ -49,9 +49,9 @@ namespace ConsoleApp1.практична_6.абстракція
         {
             Console.WriteLine($"Малювання прямокутника {Name}");
         }
-        public void Draw()
+        public string GetPrintInfo()
         {
-            Console.WriteLine($"Малювання прямокутника {Name}");
+            return GetDescription();
         }
     }
 }
