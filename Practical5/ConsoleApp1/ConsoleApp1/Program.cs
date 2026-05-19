@@ -13,7 +13,7 @@ class Program
             Specialty = "Комп'ютерні науки",
             Course = 3
         };
-
+        List<Vehicle> vehicles = new List<Vehicle>();
         const string fileName = "students.json";
         TextProcessor textProcessor = new TextProcessor();
         AdvancedLogger advancedLogger = new AdvancedLogger();
@@ -25,6 +25,7 @@ class Program
         Console.WriteLine("2. Робота з текстом та звітами");
         Console.WriteLine("3. Перевантаження операторів");
         Console.WriteLine("4. Наслідування та поліморфізм");
+        Console.WriteLine("5. Транспортні засоби");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -36,6 +37,8 @@ class Program
             Console.WriteLine("2. Робота з текстом та звітами");
             // ПРАКТИЧНА 4 5
             Console.WriteLine("3. Перевантаження операторів");
+            Console.WriteLine("4. Наслідування та поліморфізм");
+            Console.WriteLine("5. Транспортні засоби");
             // К
             Console.WriteLine("0. Вихід");
 
@@ -56,6 +59,9 @@ class Program
                     break;
                 case "4":
                     InheritanceMenu(group);
+                    break;
+                case "5":
+                    VehicleMenu(vehicles);
                     break;
                 // К
                 case "0":
@@ -259,6 +265,63 @@ class Program
                     case "8": TestHierarchy(group); break;
                     case "0": return;
                     default: Console.WriteLine("Невірний вибір"); break;
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        static void VehicleMenu(List<Vehicle> vehicles)
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ВАРІАНТ 2: ТРАНСПОРТНІ ЗАСОБИ ===");
+                Console.WriteLine("1. Додати легковий автомобіль");
+                Console.WriteLine("2. Додати автобус");
+                Console.WriteLine("3. Додати вантажівку");
+                Console.WriteLine("4. Показати весь транспорт");
+                Console.WriteLine("5. Розрахувати загальну вартість обслуговування");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        vehicles.Add(new Car("Toyota Corolla", 2020, "AA1234BB", 5));
+                        Console.WriteLine("Автомобіль додано.");
+                        break;
+
+                    case "2":
+                        vehicles.Add(new Bus("Bogdan A092", 2018, "BC5678CC", 30));
+                        Console.WriteLine("Автобус додано.");
+                        break;
+
+                    case "3":
+                        vehicles.Add(new Truck("MAN TGS", 2019, "KA9999AA", 12.5));
+                        Console.WriteLine("Вантажівку додано.");
+                        break;
+
+                    case "4":
+                        foreach (var vehicle in vehicles)
+                        {
+                            Console.WriteLine(vehicle.GetInfo());
+                            Console.WriteLine("--------------------");
+                        }
+                        break;
+
+                    case "5":
+                        Console.WriteLine($"Загальна вартість обслуговування: {vehicles.Sum(v => v.CalculateServiceCost())} грн");
+                        break;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Невірний вибір");
+                        break;
                 }
 
                 Console.WriteLine("\nНатисніть клавішу...");
