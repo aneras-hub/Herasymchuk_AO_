@@ -277,15 +277,7 @@ class Program
                 DateTime enroll = ReadDate("Дата вступу: ");
                 string note = Read("Нотатки: ");
 
-                var student = new Student
-                {
-                    fullName = name,
-                    recordBookNumber = record,
-                    personalEmail = email,
-                    DateOfBirth = dob,
-                    EnrollmentDate = enroll,
-                    Notes = note
-                };
+                var student = new Student(name, dob, email, enroll, record, note);
                 Console.Write("Початковий бал: ");
                 if (double.TryParse(Console.ReadLine(), out double g))
                 {
@@ -346,22 +338,22 @@ class Program
                 Console.WriteLine("Не знайдено");
                 return;
             }
-            Console.Write($"Нове ім'я (Enter = залишити {s.fullName}): ");
+            Console.Write($"Нове ім'я (Enter = залишити {s.FullName}): ");
             string name = Console.ReadLine();
-            string finalName = string.IsNullOrWhiteSpace(name) ? s.fullName : name;
+            string finalName = string.IsNullOrWhiteSpace(name) ? s.FullName : name;
             Student updated;
             try
             {
-                updated = new Student
-                {
-                    fullName = finalName,
-                    recordBookNumber = s.recordBookNumber,
-                    personalEmail = s.personalEmail,
-                    DateOfBirth = s.DateOfBirth,
-                    EnrollmentDate = s.EnrollmentDate,
-                    Notes = s.Notes,
-                    Journal = s.Journal
-                };
+                updated = new Student(
+                    finalName,
+                    s.DateOfBirth,
+                    s.PersonalEmail,
+                    s.EnrollmentDate,
+                    s.RecordBookNumber,
+                    s.Notes
+                );
+
+                updated.Journal = s.Journal;
             }
             catch (Exception ex)
             {
@@ -382,7 +374,7 @@ class Program
                     Console.WriteLine(ex.Message);
                 }
             }
-            group.RemoveStudent(s.recordBookNumber);
+            group.RemoveStudent(s.RecordBookNumber);
             group.AddStudent(updated);
 
             Console.Write($"Нова нотатка (Enter = залишити поточну): ");
@@ -651,7 +643,7 @@ class Program
             foreach (var student in group.FindByName(""))
             {
                 bool result = processor.IsPalindrome(student.Notes);
-                Console.WriteLine($"{student.fullName}: " + (result ? "Паліндром" : "Не паліндром"));
+                Console.WriteLine($"{student.FullName}: " + (result ? "Паліндром" : "Не паліндром"));
             }
         }
         static void ComparePerformance(TextProcessor processor)
@@ -722,15 +714,16 @@ class Program
                 Course = 2
             };
 
-            other.AddStudent(new Student
-            {
-                fullName = "Іваненко Іван Іванович",
-                recordBookNumber = "99999999",
-                personalEmail = "test@test.com",
-                DateOfBirth = new DateTime(2005, 1, 1),
-                EnrollmentDate = DateTime.Now,
-                CourseProgress = 90
-            });
+            Student testStudent = new Student(
+                "Іваненко Іван Іванович",
+                new DateTime(2005, 1, 1),
+                "test@test.com",
+                DateTime.Now,
+                "99999999"
+            );
+
+            testStudent.CourseProgress = 90;
+            other.AddStudent(testStudent);
 
             StudentGroup merged = group + other;
 
@@ -784,15 +777,15 @@ class Program
                 Course = 1
             };
 
-            Student s = new Student
-            {
-                fullName = "Петров Петро Петрович",
-                recordBookNumber = "77777777",
-                personalEmail = "petro@test.com",
-                DateOfBirth = new DateTime(2004, 5, 5),
-                EnrollmentDate = DateTime.Now,
-                CourseProgress = 70
-            };
+            Student s = new Student(
+                "Петров Петро Петрович",
+                new DateTime(2004, 5, 5),
+                "petro@test.com",
+                DateTime.Now,
+                "77777777"
+            );
+
+            s.CourseProgress = 70;
 
             s.Journal.SetGrade("C#", 60);
 
@@ -825,8 +818,8 @@ class Program
                 return;
             }
 
-            Console.WriteLine($"Студент 1: {s1.fullName}");
-            Console.WriteLine($"Студент 2: {s2.fullName}");
+            Console.WriteLine($"Студент 1: {s1.FullName}");
+            Console.WriteLine($"Студент 2: {s2.FullName}");
 
             Console.WriteLine();
 
