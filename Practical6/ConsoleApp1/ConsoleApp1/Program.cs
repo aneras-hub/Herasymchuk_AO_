@@ -9,6 +9,7 @@ using ConsoleApp1.машинки;
 using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_6;
 using ConsoleApp1.практична_6.інтерфейс;
+using ConsoleApp1.індивідуальні_завдання;
 class Program
 {
     static void Main()
@@ -20,6 +21,7 @@ class Program
             Course = 3
         };
         List<Vehicle> vehicles = new List<Vehicle>();
+        List<Payment> payments = new List<Payment>();
         const string fileName = "students.json";
         TextProcessor textProcessor = new TextProcessor();
         AdvancedLogger advancedLogger = new AdvancedLogger();
@@ -33,6 +35,7 @@ class Program
         Console.WriteLine("4. Наслідування та поліморфізм");
         Console.WriteLine("5. Транспортні засоби");
         Console.WriteLine("6. Поліморфізм фігур");
+        Console.WriteLine("7. Ієрархія платежів");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -46,6 +49,7 @@ class Program
             Console.WriteLine("4. Наслідування та поліморфізм");
             Console.WriteLine("5. Транспортні засоби");
             Console.WriteLine("6. Поліморфізм фігур");
+            Console.WriteLine("7. Ієрархія платежів");
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -70,6 +74,9 @@ class Program
                     break;
                 case "6":
                     ShapesMenu(group);
+                    break;
+                case "7":
+                    PaymentMenu(payments);
                     break;
                 case "0":
                     return;
@@ -382,6 +389,114 @@ class Program
                     case "7":
                         PolymorphismDemo(group);
                         break;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Невірний вибір");
+                        break;
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        static void PaymentMenu(List<Payment> payments)
+        {
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ВАРІАНТ 2: ІЄРАРХІЯ ПЛАТЕЖІВ ===");
+                Console.WriteLine("1. Додати оплату карткою");
+                Console.WriteLine("2. Додати оплату готівкою");
+                Console.WriteLine("3. Додати криптооплату");
+                Console.WriteLine("4. Показати всі платежі");
+                Console.WriteLine("5. Обробити всі платежі");
+                Console.WriteLine("6. Загальна сума платежів");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        {
+                            decimal amount = ReadDecimal("Сума: ");
+                            string currency = Read("Валюта: ");
+                            string card = Read("Номер карти: ");
+
+                            payments.Add(
+                                new CardPayment(amount, currency, card)
+                            );
+
+                            Console.WriteLine("Оплату карткою додано.");
+                            break;
+                        }
+
+                    case "2":
+                        {
+                            decimal amount = ReadDecimal("Сума: ");
+                            string currency = Read("Валюта: ");
+                            string cashier = Read("Касир: ");
+
+                            payments.Add(
+                                new CashPayment(amount, currency, cashier)
+                            );
+
+                            Console.WriteLine("Готівкову оплату додано.");
+                            break;
+                        }
+
+                    case "3":
+                        {
+                            decimal amount = ReadDecimal("Сума: ");
+                            string currency = Read("Валюта: ");
+                            string wallet = Read("Адреса гаманця: ");
+                            string crypto = Read("Криптовалюта: ");
+
+                            payments.Add(
+                                new CryptoPayment(amount, currency, wallet, crypto)
+                            );
+
+                            Console.WriteLine("Криптооплату додано.");
+                            break;
+                        }
+
+                    case "4":
+                        {
+                            foreach (Payment payment in payments)
+                            {
+                                Console.WriteLine(payment.GetInfo());
+                                Console.WriteLine("--------------------");
+                            }
+
+                            break;
+                        }
+
+                    case "5":
+                        {
+                            foreach (Payment payment in payments)
+                            {
+                                bool result = payment.ProcessPayment();
+
+                                Console.WriteLine(
+                                    $"{payment.GetType().Name} -> " +
+                                    (result ? "УСПІШНО" : "ПОМИЛКА")
+                                );
+                            }
+
+                            break;
+                        }
+
+                    case "6":
+                        {
+                            decimal total = payments.Sum(p => p.Amount);
+
+                            Console.WriteLine($"Загальна сума: {total}");
+                            break;
+                        }
 
                     case "0":
                         return;
@@ -1293,6 +1408,18 @@ class Program
                 Console.Write(msg);
 
                 if (double.TryParse(Console.ReadLine(), out double value))
+                    return value;
+
+                Console.WriteLine("Невірне число.");
+            }
+        }
+        static decimal ReadDecimal(string msg)
+        {
+            while (true)
+            {
+                Console.Write(msg);
+
+                if (decimal.TryParse(Console.ReadLine(), out decimal value))
                     return value;
 
                 Console.WriteLine("Невірне число.");
