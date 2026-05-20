@@ -23,6 +23,7 @@ class Program
             Specialty = "Комп'ютерні науки",
             Course = 3
         };
+
         List<Vehicle> vehicles = new List<Vehicle>();
         List<Payment> payments = new List<Payment>();
         const string fileName = "students.json";
@@ -41,6 +42,7 @@ class Program
         Console.WriteLine("7. Ієрархія платежів");
         Console.WriteLine("8. Робота зі структурами");
         Console.WriteLine("9. Робота з файлами");
+        Console.WriteLine("10. Практична 9: Делегати та події");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -57,6 +59,7 @@ class Program
             Console.WriteLine("7. Ієрархія платежів");
             Console.WriteLine("8. Робота зі структурами");
             Console.WriteLine("9. Робота з файлами");
+            Console.WriteLine("10. Практична 9: Делегати та події");
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -90,6 +93,9 @@ class Program
                     break;
                 case "9":
                     FileMenu(ref group);
+                    break;
+                case "10":
+                    DelegatesPracticeMenu(group, advancedLogger);
                     break;
                 case "0":
                     return;
@@ -669,6 +675,110 @@ class Program
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Помилка: {ex.Message}");
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+        static void DelegatesPracticeMenu(
+    StudentGroup group,
+    AdvancedLogger advancedLogger)
+        {
+            NotificationSystem notificationSystem = new NotificationSystem();
+
+            notificationSystem.StudentAdded += (sender, e) =>
+            {
+                Console.WriteLine("[LOG]");
+                Console.WriteLine(e.Message);
+            };
+
+            notificationSystem.StudentAdded += (sender, e) =>
+            {
+                Console.WriteLine("[EMAIL]");
+                Console.WriteLine($"Викладачу надіслано повідомлення про студента: {e.Student.FullName}");
+            };
+
+            notificationSystem.StudentRemoved += (sender, e) =>
+            {
+                Console.WriteLine("[LOG]");
+                Console.WriteLine(e.Message);
+            };
+
+            notificationSystem.ReportGenerated += (sender, e) =>
+            {
+                Console.WriteLine("[REPORT]");
+                Console.WriteLine($"Звіт створено: {e.GeneratedAt}");
+                Console.WriteLine(e.ReportText);
+            };
+
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ПРАКТИЧНА 9: ДЕЛЕГАТИ ТА ПОДІЇ ===");
+                Console.WriteLine("1. Показати власний делегат StudentOperation");
+                Console.WriteLine("2. Показати власний делегат GroupOperation");
+                Console.WriteLine("3. Predicate<Student> — фільтр студентів");
+                Console.WriteLine("4. Func<Student, double> — обчислення показників");
+                Console.WriteLine("5. Action<string> — логування");
+                Console.WriteLine("6. Func<StudentGroup, string> — генерація звіту");
+                Console.WriteLine("7. Подія StudentAdded з кількома підписниками");
+                Console.WriteLine("8. Подія StudentRemoved");
+                Console.WriteLine("9. Подія ReportGenerated");
+                Console.WriteLine("10. Переглянути історію подій");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ShowStudentOperationDelegate(group);
+                        break;
+
+                    case "2":
+                        ShowGroupOperationDelegate(group);
+                        break;
+
+                    case "3":
+                        ShowPredicateDemo(group);
+                        break;
+
+                    case "4":
+                        ShowFuncStudentDoubleDemo(group);
+                        break;
+
+                    case "5":
+                        ShowActionStringDemo(advancedLogger);
+                        break;
+
+                    case "6":
+                        ShowFuncGroupReportDemo(group);
+                        break;
+
+                    case "7":
+                        ShowStudentAddedEventDemo(group, notificationSystem);
+                        break;
+
+                    case "8":
+                        ShowStudentRemovedEventDemo(group, notificationSystem);
+                        break;
+
+                    case "9":
+                        ShowReportGeneratedEventDemo(group, notificationSystem);
+                        break;
+
+                    case "10":
+                        notificationSystem.ShowHistory();
+                        break;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Невірний вибір.");
+                        break;
                 }
 
                 Console.WriteLine("\nНатисніть клавішу...");
@@ -1785,31 +1895,199 @@ class Program
 
 
 
-        NotificationSystem notifications = new NotificationSystem();
 
-        // Перший підписник
-        notifications.StudentAdded += (sender, e) =>
+        static void ShowStudentOperationDelegate(StudentGroup group)
         {
-            Console.WriteLine("[LOG]");
-            Console.WriteLine(e.Message);
-        };
+            Console.WriteLine("=== StudentOperation ===");
 
-        // Другий підписник
-        notifications.StudentAdded += (sender, e) =>
+            StudentOperation operation = student =>
+            {
+                Console.WriteLine($"Студент: {student.FullName}");
+                Console.WriteLine($"Середній бал: {student.averageGrade}");
+                Console.WriteLine("--------------------");
+            };
+
+            group.PerformStudentOperation(operation);
+        }
+        static void ShowGroupOperationDelegate(StudentGroup group)
         {
-            Console.WriteLine("[EMAIL]");
-            Console.WriteLine($"Надіслано повідомлення про студента {e.Student.FullName}");
-        };
+            Console.WriteLine("=== GroupOperation ===");
 
-        // Тест
-        Student student = new Student(
-            "Іваненко Іван",
-            new DateTime(2005, 1, 1),
-            "ivan@test.com",
-            DateTime.Now,
-            "12345678"
-        );
+            GroupOperation operation = g =>
+            {
+                Console.WriteLine($"Група: {g.GroupName}");
+                Console.WriteLine($"Спеціальність: {g.Specialty}");
+                Console.WriteLine($"Курс: {g.Course}");
+                Console.WriteLine($"Кількість студентів: {g.GroupSize}");
+                Console.WriteLine($"Середній бал групи: {g.AverageGroupGrade}");
+            };
 
-        notifications.OnStudentAdded(student);
+            group.PerformGroupOperation(operation);
+        }
+        static void ShowPredicateDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== Predicate<Student> ===");
+
+            Console.WriteLine("1. Відмінники");
+            Console.WriteLine("2. Боржники");
+            Console.Write("Ваш вибір: ");
+
+            string choice = Console.ReadLine();
+
+            Predicate<Student> predicate;
+
+            if (choice == "1")
+            {
+                predicate = s => s.averageGrade >= 90;
+            }
+            else
+            {
+                predicate = s => s.averageGrade < 60;
+            }
+
+            List<Student> result = group.FilterStudents(predicate);
+
+            if (result.Count == 0)
+            {
+                Console.WriteLine("Студентів не знайдено.");
+                return;
+            }
+
+            foreach (Student student in result)
+            {
+                Console.WriteLine($"{student.FullName} — {student.averageGrade}");
+            }
+        }
+        static void ShowFuncStudentDoubleDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== Func<Student, double> ===");
+
+            if (group.GetAllStudents().Count == 0)
+            {
+                Console.WriteLine("У групі немає студентів.");
+                return;
+            }
+
+            Student student = group.GetAllStudents()[0];
+
+            double average = group.CalculateStudentMetric(
+                student,
+                s => s.averageGrade
+            );
+
+            double progress = group.CalculateStudentMetric(
+                student,
+                s => s.CourseProgress
+            );
+
+            double labAverage = group.CalculateStudentMetric(
+                student,
+                s => s.AverageLabGrade
+            );
+
+            Console.WriteLine($"Студент: {student.FullName}");
+            Console.WriteLine($"Середній бал: {average}");
+            Console.WriteLine($"Прогрес навчання: {progress}%");
+            Console.WriteLine($"Середній бал лабораторних: {labAverage}");
+        }
+        static void ShowActionStringDemo(AdvancedLogger advancedLogger)
+        {
+            Console.WriteLine("=== Action<string> ===");
+
+            advancedLogger.ExecuteLogAction(
+                "Тестове повідомлення для логування.",
+                message =>
+                {
+                    Console.WriteLine($"[CONSOLE LOG] {message}");
+                }
+            );
+
+            advancedLogger.ExecuteLogAction(
+                "Повідомлення записано у файл.",
+                message =>
+                {
+                    File.AppendAllText(
+                        "delegate_log.txt",
+                        $"[FILE LOG] {message}{Environment.NewLine}"
+                    );
+
+                    Console.WriteLine("Лог записано у файл delegate_log.txt");
+                }
+            );
+        }
+        static void ShowFuncGroupReportDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== Func<StudentGroup, string> ===");
+
+            string report = group.GenerateCustomReport(
+                g =>
+                {
+                    return
+                        $"=== КОРОТКИЙ ЗВІТ ГРУПИ ===\n" +
+                        $"Група: {g.GroupName}\n" +
+                        $"Спеціальність: {g.Specialty}\n" +
+                        $"Курс: {g.Course}\n" +
+                        $"Кількість студентів: {g.GroupSize}\n" +
+                        $"Середній бал: {g.AverageGroupGrade}";
+                }
+            );
+
+            Console.WriteLine(report);
+        }
+        static void ShowStudentAddedEventDemo(
+    StudentGroup group,
+    NotificationSystem notificationSystem)
+        {
+            Console.WriteLine("=== StudentAdded EVENT ===");
+
+            Student student = new Student(
+                "Тестовий Студент Делегатович",
+                new DateTime(2005, 1, 1),
+                "delegate@student.com",
+                DateTime.Now,
+                DateTime.Now.Ticks.ToString().Substring(0, 8),
+                "Студент створений для демонстрації подій"
+            );
+
+            group.AddStudent(student);
+
+            notificationSystem.OnStudentAdded(student);
+        }
+        static void ShowStudentRemovedEventDemo(
+    StudentGroup group,
+    NotificationSystem notificationSystem)
+        {
+            Console.WriteLine("=== StudentRemoved EVENT ===");
+
+            if (group.GetAllStudents().Count == 0)
+            {
+                Console.WriteLine("У групі немає студентів для видалення.");
+                return;
+            }
+
+            Student student = group.GetAllStudents().Last();
+
+            group.RemoveStudent(student.RecordBookNumber);
+
+            notificationSystem.OnStudentRemoved(student);
+        }
+        static void ShowReportGeneratedEventDemo(StudentGroup group,  NotificationSystem notificationSystem)
+        {
+            Console.WriteLine("=== ReportGenerated EVENT ===");
+
+            string report = group.GenerateCustomReport(
+                g =>
+                {
+                    return
+                        $"Група: {g.GroupName}\n" +
+                        $"Кількість студентів: {g.GroupSize}\n" +
+                        $"Середній бал: {g.AverageGroupGrade}";
+                }
+            );
+
+            notificationSystem.OnReportGenerated(group, report);
+        }
+        
     }
+
 }

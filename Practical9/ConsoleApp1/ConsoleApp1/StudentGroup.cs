@@ -11,6 +11,7 @@ using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_7;
 using ConsoleApp1.практична_8;
+using ConsoleApp1.практична_9;
 
 namespace ConsoleApp1
 {
@@ -541,6 +542,29 @@ namespace ConsoleApp1
 
 
 
+        public List<Student> FilterStudents(Predicate<Student> predicate)
+        {
+            return _students.FindAll(predicate);
+        }
+        public double CalculateStudentMetric(Student student, Func<Student, double> calculator)
+        {
+            return calculator(student);
+        }
+        public string GenerateCustomReport(Func<StudentGroup, string> generator)
+        {
+            return generator(this);
+        }
+        public void PerformStudentOperation(StudentOperation operation)
+        {
+            foreach (Student student in _students)
+            {
+                operation(student);
+            }
+        }
 
+        public void PerformGroupOperation(GroupOperation operation)
+        {
+            operation(this);
+        }
     }
 }

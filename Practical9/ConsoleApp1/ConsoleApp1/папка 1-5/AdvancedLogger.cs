@@ -53,6 +53,17 @@ namespace ConsoleApp1
             }
             return result.ToString();
         }
+        // Кінцева практика 3
+
+
+
+
+
+
+
+        public void ExecuteLogAction(string message, Action<string> logger)
+        {
+            logger(message);
+        }
     }
-    // Кінцева практика 3
 }
