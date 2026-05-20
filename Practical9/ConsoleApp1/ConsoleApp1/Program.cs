@@ -12,6 +12,7 @@ using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.індивідуальні_завдання;
 using ConsoleApp1.практична_7;
 using ConsoleApp1.практична_8;
+using ConsoleApp1.практична_9;
 class Program
 {
     static void Main()
@@ -1758,5 +1759,57 @@ class Program
 
             Console.WriteLine("Студентів імпортовано з CSV-файлу.");
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        NotificationSystem notifications = new NotificationSystem();
+
+        // Перший підписник
+        notifications.StudentAdded += (sender, e) =>
+        {
+            Console.WriteLine("[LOG]");
+            Console.WriteLine(e.Message);
+        };
+
+        // Другий підписник
+        notifications.StudentAdded += (sender, e) =>
+        {
+            Console.WriteLine("[EMAIL]");
+            Console.WriteLine($"Надіслано повідомлення про студента {e.Student.FullName}");
+        };
+
+        // Тест
+        Student student = new Student(
+            "Іваненко Іван",
+            new DateTime(2005, 1, 1),
+            "ivan@test.com",
+            DateTime.Now,
+            "12345678"
+        );
+
+        notifications.OnStudentAdded(student);
     }
 }
