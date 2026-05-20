@@ -681,34 +681,23 @@ class Program
                 Console.ReadKey();
             }
         }
-        static void DelegatesPracticeMenu(
-    StudentGroup group,
-    AdvancedLogger advancedLogger)
+        static void DelegatesPracticeMenu(StudentGroup group, AdvancedLogger advancedLogger)
         {
             NotificationSystem notificationSystem = new NotificationSystem();
 
             notificationSystem.StudentAdded += (sender, e) =>
             {
-                Console.WriteLine("[LOG]");
-                Console.WriteLine(e.Message);
-            };
-
-            notificationSystem.StudentAdded += (sender, e) =>
-            {
-                Console.WriteLine("[EMAIL]");
-                Console.WriteLine($"Викладачу надіслано повідомлення про студента: {e.Student.FullName}");
+                Console.WriteLine($"[LOG] {e.Message}");
             };
 
             notificationSystem.StudentRemoved += (sender, e) =>
             {
-                Console.WriteLine("[LOG]");
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"[REMOVE] {e.Message}");
             };
 
             notificationSystem.ReportGenerated += (sender, e) =>
             {
-                Console.WriteLine("[REPORT]");
-                Console.WriteLine($"Звіт створено: {e.GeneratedAt}");
+                Console.WriteLine("[REPORT GENERATED]");
                 Console.WriteLine(e.ReportText);
             };
 
@@ -717,80 +706,57 @@ class Program
                 Console.Clear();
 
                 Console.WriteLine("=== ПРАКТИЧНА 9: ДЕЛЕГАТИ ТА ПОДІЇ ===");
-                Console.WriteLine("1. Показати власний делегат StudentOperation");
-                Console.WriteLine("2. Показати власний делегат GroupOperation");
-                Console.WriteLine("3. Predicate<Student> — фільтр студентів");
-                Console.WriteLine("4. Func<Student, double> — обчислення показників");
-                Console.WriteLine("5. Action<string> — логування");
-                Console.WriteLine("6. Func<StudentGroup, string> — генерація звіту");
-                Console.WriteLine("7. Подія StudentAdded з кількома підписниками");
-                Console.WriteLine("8. Подія StudentRemoved");
-                Console.WriteLine("9. Подія ReportGenerated");
-                Console.WriteLine("10. Переглянути історію подій");
-                Console.WriteLine("11. Інтегровані події StudentGroup");
-                Console.WriteLine("12. PerformOperationOnStudents");
-                Console.WriteLine("13. Сортування студентів через лямбда");
-                Console.WriteLine("14. Подія AverageGradeChanged у Student");
+
+                Console.WriteLine("1. Додати обробник події при додаванні студента");
+                Console.WriteLine("2. Застосувати фільтр через Predicate");
+                Console.WriteLine("3. Виконати операцію над студентами через Action");
+                Console.WriteLine("4. Згенерувати звіт через Func");
+                Console.WriteLine("5. Продемонструвати систему подій");
+                Console.WriteLine("6. Сортування студентів лямбда-виразами");
+                Console.WriteLine("7. Тестування callback-механізмів");
+                Console.WriteLine("8. Переглянути історію подій");
                 Console.WriteLine("0. Назад");
 
+                Console.Write("\nВаш вибір: ");
+
                 string choice = Console.ReadLine();
+
+                Console.Clear();
 
                 switch (choice)
                 {
                     case "1":
-                        ShowStudentOperationDelegate(group);
-                        break;
-
-                    case "2":
-                        ShowGroupOperationDelegate(group);
-                        break;
-
-                    case "3":
-                        ShowPredicateDemo(group);
-                        break;
-
-                    case "4":
-                        ShowFuncStudentDoubleDemo(group);
-                        break;
-
-                    case "5":
-                        ShowActionStringDemo(advancedLogger);
-                        break;
-
-                    case "6":
-                        ShowFuncGroupReportDemo(group);
-                        break;
-
-                    case "7":
                         ShowStudentAddedEventDemo(group, notificationSystem);
                         break;
 
-                    case "8":
-                        ShowStudentRemovedEventDemo(group, notificationSystem);
+                    case "2":
+                        ShowPredicateDemo(group);
                         break;
 
-                    case "9":
-                        ShowReportGeneratedEventDemo(group, notificationSystem);
-                        break;
-
-                    case "10":
-                        notificationSystem.ShowHistory();
-                        break;
-                    case "11":
-                        ShowStudentGroupEventsDemo(group);
-                        break;
-
-                    case "12":
+                    case "3":
                         ShowPerformOperationOnStudentsDemo(group);
                         break;
 
-                    case "13":
+                    case "4":
+                        ShowFuncGroupReportDemo(group);
+                        break;
+
+                    case "5":
+                        ShowStudentGroupEventsDemo(group);
+                        break;
+
+                    case "6":
                         ShowLambdaSortingDemo(group);
                         break;
 
-                    case "14":
-                        ShowAverageGradeChangedDemo(group);
+                    case "7":
+                        ShowCallbackDemo(group);
                         break;
+
+                    case "8":
+                        notificationSystem.ShowHistory();
+                        break;
+
                     case "0":
                         return;
 
@@ -799,7 +765,7 @@ class Program
                         break;
                 }
 
-                Console.WriteLine("\nНатисніть клавішу...");
+                Console.WriteLine("\nНатисніть будь-яку клавішу...");
                 Console.ReadKey();
             }
         }
@@ -2210,6 +2176,20 @@ class Program
             student.Journal.SetGrade("C#", 100);
 
             student.CheckAverageGradeChanged(oldAverage);
+        }
+        static void ShowCallbackDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== CALLBACK-МЕХАНІЗМ ===");
+
+            Action<Student> callback = student =>
+            {
+                Console.WriteLine($"Callback викликано для студента: {student.FullName}");
+            };
+
+            group.PerformOperationOnStudents(
+                student => student.averageGrade >= 0,
+                callback
+            );
         }
     }
 }
