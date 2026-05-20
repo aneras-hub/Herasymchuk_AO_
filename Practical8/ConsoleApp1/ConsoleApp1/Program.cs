@@ -11,6 +11,7 @@ using ConsoleApp1.практична_6;
 using ConsoleApp1.практична_6.інтерфейс;
 using ConsoleApp1.індивідуальні_завдання;
 using ConsoleApp1.практична_7;
+using ConsoleApp1.практична_8;
 class Program
 {
     static void Main()
@@ -38,6 +39,7 @@ class Program
         Console.WriteLine("6. Поліморфізм фігур");
         Console.WriteLine("7. Ієрархія платежів");
         Console.WriteLine("8. Робота зі структурами");
+        Console.WriteLine("9. Робота з файлами");
         Console.WriteLine("0. Вихід");
 
         while (true)
@@ -53,6 +55,7 @@ class Program
             Console.WriteLine("6. Поліморфізм фігур");
             Console.WriteLine("7. Ієрархія платежів");
             Console.WriteLine("8. Робота зі структурами");
+            Console.WriteLine("9. Робота з файлами");
             Console.WriteLine("0. Вихід");
 
             string mainChoice = Console.ReadLine();
@@ -83,6 +86,9 @@ class Program
                     break;
                 case "8":
                     StructuresMenu(group);
+                    break;
+                case "9":
+                    FileMenu(ref group);
                     break;
                 case "0":
                     return;
@@ -578,6 +584,97 @@ class Program
                 Console.ReadKey();
             }
         }
+        static void FileMenu(ref StudentGroup group)
+        {
+            FileManager fileManager = new FileManager();
+
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("=== ПРАКТИЧНА 8: РОБОТА З ФАЙЛАМИ ===");
+                Console.WriteLine("1. Зберегти групу у JSON");
+                Console.WriteLine("2. Завантажити групу з JSON");
+                Console.WriteLine("3. Експорт у CSV");
+                Console.WriteLine("4. Зберегти звіт у текстовий файл");
+                Console.WriteLine("5. Створити резервну копію");
+                Console.WriteLine("6. Переглянути файли в папці Backups");
+                Console.WriteLine("7. Імпорт студентів з текстового файлу");
+                Console.WriteLine("8. Очистити старі бекапи");
+                Console.WriteLine("9. Тестування обробки винятків");
+                Console.WriteLine("0. Назад");
+
+                string choice = Console.ReadLine();
+
+                try
+                {
+                    switch (choice)
+                    {
+                        case "1":
+                            group.Save("students_v8.json", StorageFormat.Json);
+                            Console.WriteLine("Групу збережено у students_v8.json");
+                            break;
+
+                        case "2":
+                            group = StudentGroup.Load("students_v8.json", StorageFormat.Json);
+                            Console.WriteLine("Групу завантажено з students_v8.json");
+                            break;
+
+                        case "3":
+                            group.ExportGradesToCsv("grades.csv");
+                            Console.WriteLine("Оцінки експортовано у grades.csv");
+                            break;
+
+                        case "4":
+                            group.Save("group_report.txt", StorageFormat.Text);
+                            Console.WriteLine("Звіт збережено у group_report.txt");
+                            break;
+
+                        case "5":
+                            fileManager.CreateBackup("students_v8.json");
+                            Console.WriteLine("Резервну копію створено.");
+                            break;
+
+                        case "6":
+                            ShowBackupFiles(fileManager);
+                            break;
+
+                        case "7":
+                            ImportStudentsFromTextFile(group, fileManager);
+                            break;
+
+                        case "8":
+                            int days = ReadInt("Видалити бекапи старші за кількість днів: ");
+                            fileManager.CleanOldBackups(days);
+                            Console.WriteLine("Старі бекапи очищено.");
+                            break;
+
+                        case "9":
+                            TestFileExceptions(fileManager);
+                            break;
+
+                        case "0":
+                            return;
+
+                        default:
+                            Console.WriteLine("Невірний вибір.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Помилка: {ex.Message}");
+                }
+
+                Console.WriteLine("\nНатисніть клавішу...");
+                Console.ReadKey();
+            }
+        }
+
+
+
+
+
 
         static void AddStudent(StudentGroup group)
         {
@@ -1589,6 +1686,63 @@ class Program
             Console.WriteLine($"\nDeconstruct:");
             Console.WriteLine($"Amount = {amount}");
             Console.WriteLine($"Currency = {currency}");
+        }
+
+
+
+
+        static void ShowBackupFiles(FileManager fileManager)
+        {
+            Directory.CreateDirectory("Backups");
+
+            string[] files = fileManager.GetDirectoryFiles("Backups");
+
+            if (files.Length == 0)
+            {
+                Console.WriteLine("Папка Backups порожня.");
+                return;
+            }
+
+            Console.WriteLine("=== ФАЙЛИ В ПАПЦІ BACKUPS ===");
+
+            foreach (string file in files)
+            {
+                Console.WriteLine(Path.GetFileName(file));
+            }
+        }
+        static void ImportStudentsFromTextFile(StudentGroup group, FileManager fileManager)
+        {
+            Console.Write("Шлях до текстового файлу: ");
+            string path = Console.ReadLine();
+
+            string content = fileManager.ReadFromText(path);
+            group.ImportStudentsFromText(content);
+
+            Console.WriteLine("Студентів імпортовано з текстового файлу.");
+        }
+        static void TestFileExceptions(FileManager fileManager)
+        {
+            try
+            {
+                fileManager.LoadFromJson<StudentGroup>("missing_file.json");
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"FileNotFoundException: {ex.Message}");
+            }
+
+            try
+            {
+                fileManager.LoadFromJson<StudentGroup>("wrong_format.txt");
+            }
+            catch (InvalidFileFormatException ex)
+            {
+                Console.WriteLine($"InvalidFileFormatException: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Інша помилка: {ex.Message}");
+            }
         }
     }
 }
