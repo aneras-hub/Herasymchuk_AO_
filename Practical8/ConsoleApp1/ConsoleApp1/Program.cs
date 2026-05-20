@@ -602,6 +602,7 @@ class Program
                 Console.WriteLine("7. Імпорт студентів з текстового файлу");
                 Console.WriteLine("8. Очистити старі бекапи");
                 Console.WriteLine("9. Тестування обробки винятків");
+                Console.WriteLine("10. Імпорт студентів з CSV файлу");
                 Console.WriteLine("0. Назад");
 
                 string choice = Console.ReadLine();
@@ -651,6 +652,9 @@ class Program
 
                         case "9":
                             TestFileExceptions(fileManager);
+                            break;
+                        case "10":
+                            ImportStudentsFromCsvFile(group, fileManager);
                             break;
 
                         case "0":
@@ -1743,6 +1747,15 @@ class Program
             {
                 Console.WriteLine($"Інша помилка: {ex.Message}");
             }
+        }
+        static void ImportStudentsFromCsvFile( StudentGroup group, FileManager fileManager)
+        {
+            Console.Write("Шлях до CSV-файлу: ");
+            string path = Console.ReadLine();
+
+            fileManager.ImportStudentsFromCsv(group, path);
+
+            Console.WriteLine("Студентів імпортовано з CSV-файлу.");
         }
     }
 }

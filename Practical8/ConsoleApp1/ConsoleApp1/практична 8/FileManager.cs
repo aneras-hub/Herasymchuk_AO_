@@ -225,11 +225,13 @@ namespace ConsoleApp1.практична_8
                     );
 
                     group.AddStudent(student);
+                    
                 }
                 catch
                 {
                     // пропускаємо некоректні рядки
                 }
+                Console.WriteLine("Імпорт студентів завершено.");
             }
         }
     }
