@@ -82,5 +82,42 @@ namespace ConsoleApp1.практична_8
                 }
             }
         }
+
+
+
+        public void CreateDefaultDirectories()
+        {
+            Directory.CreateDirectory("Backups");
+            Directory.CreateDirectory("Reports");
+            Directory.CreateDirectory("Logs");
+        }
+        public void CopyFile(string sourcePath, string destinationPath)
+        {
+            if (!File.Exists(sourcePath))
+                throw new FileNotFoundException("Файл для копіювання не знайдено.", sourcePath);
+
+            File.Copy(sourcePath, destinationPath, true);
+        }
+        public void MoveFile(string sourcePath, string destinationPath)
+        {
+            if (!File.Exists(sourcePath))
+                throw new FileNotFoundException("Файл для переміщення не знайдено.", sourcePath);
+
+            File.Move(sourcePath, destinationPath, true);
+        }
+        public void DeleteFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("Файл для видалення не знайдено.", filePath);
+
+            File.Delete(filePath);
+        }
+        public string[] GetDirectoryFiles(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+                throw new DirectoryNotFoundException("Папку не знайдено.");
+
+            return Directory.GetFiles(directoryPath);
+        }
     }
 }
