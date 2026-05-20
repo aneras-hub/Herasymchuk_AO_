@@ -9,12 +9,15 @@ using ConsoleApp1.практична_6.абстракція;
 using ConsoleApp1.практична_6;
 using System.Text.Json.Serialization;
 using ConsoleApp1.практична_7;
+using ConsoleApp1.практична_9;
 
 namespace ConsoleApp1
 {
     public enum StudentStatus { Active, AcademicLeave, Expelled, Graduated }
+    
     public class Student : UniversityMember, ICloneable
     {
+        public event EventHandler<StudentEventArgs> AverageGradeChanged;
         public DateTime EnrollmentDate { get; set; }
         public StudentStatus Status { get; private set; } = StudentStatus.Active;
         public GradeJournal Journal { get; set; } = new();
@@ -287,6 +290,21 @@ namespace ConsoleApp1
                 averageGrade,
                 CourseProgress
             );
+        }
+        public void CheckAverageGradeChanged(double oldAverage)
+        {
+            double newAverage = averageGrade;
+
+            if (oldAverage != newAverage)
+            {
+                AverageGradeChanged?.Invoke(
+                    this,
+                    new StudentEventArgs(
+                        this,
+                        $"Середній бал студента {FullName} змінився: {oldAverage} -> {newAverage}"
+                    )
+                );
+            }
         }
     }
 }

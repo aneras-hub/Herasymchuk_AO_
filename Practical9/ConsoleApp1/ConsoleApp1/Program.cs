@@ -727,6 +727,10 @@ class Program
                 Console.WriteLine("8. Подія StudentRemoved");
                 Console.WriteLine("9. Подія ReportGenerated");
                 Console.WriteLine("10. Переглянути історію подій");
+                Console.WriteLine("11. Інтегровані події StudentGroup");
+                Console.WriteLine("12. PerformOperationOnStudents");
+                Console.WriteLine("13. Сортування студентів через лямбда");
+                Console.WriteLine("14. Подія AverageGradeChanged у Student");
                 Console.WriteLine("0. Назад");
 
                 string choice = Console.ReadLine();
@@ -772,7 +776,21 @@ class Program
                     case "10":
                         notificationSystem.ShowHistory();
                         break;
+                    case "11":
+                        ShowStudentGroupEventsDemo(group);
+                        break;
 
+                    case "12":
+                        ShowPerformOperationOnStudentsDemo(group);
+                        break;
+
+                    case "13":
+                        ShowLambdaSortingDemo(group);
+                        break;
+
+                    case "14":
+                        ShowAverageGradeChangedDemo(group);
+                        break;
                     case "0":
                         return;
 
@@ -884,7 +902,7 @@ class Program
             {
                 Console.WriteLine($"Тип помилки: {ex.GetType().Name}");
                 Console.WriteLine($"Повідомлення: {ex.Message}");
-            return;
+                return;
             }
             Console.Write("Новий бал (Enter = пропустити): ");
             string gradeInput = Console.ReadLine();
@@ -1860,7 +1878,7 @@ class Program
                 Console.WriteLine($"Інша помилка: {ex.Message}");
             }
         }
-        static void ImportStudentsFromCsvFile( StudentGroup group, FileManager fileManager)
+        static void ImportStudentsFromCsvFile(StudentGroup group, FileManager fileManager)
         {
             Console.Write("Шлях до CSV-файлу: ");
             string path = Console.ReadLine();
@@ -2071,7 +2089,7 @@ class Program
 
             notificationSystem.OnStudentRemoved(student);
         }
-        static void ShowReportGeneratedEventDemo(StudentGroup group,  NotificationSystem notificationSystem)
+        static void ShowReportGeneratedEventDemo(StudentGroup group, NotificationSystem notificationSystem)
         {
             Console.WriteLine("=== ReportGenerated EVENT ===");
 
@@ -2087,7 +2105,111 @@ class Program
 
             notificationSystem.OnReportGenerated(group, report);
         }
-        
-    }
+        static void ShowStudentGroupEventsDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== ПОДІЇ STUDENTGROUP ===");
 
+            group.StudentAdded += (sender, e) =>
+            {
+                Console.WriteLine($"[StudentAdded] {e.Message}");
+            };
+
+            group.StudentRemoved += (sender, e) =>
+            {
+                Console.WriteLine($"[StudentRemoved] {e.Message}");
+            };
+
+            group.GradeChanged += (sender, e) =>
+            {
+                Console.WriteLine($"[GradeChanged] {e.Message}");
+            };
+
+            Student student = new Student(
+                "Подієвий Студент Тестовий",
+                new DateTime(2005, 1, 1),
+                "event@student.com",
+                DateTime.Now,
+                DateTime.Now.Ticks.ToString().Substring(0, 8),
+                "Тест подій StudentGroup"
+            );
+
+            group.AddStudent(student);
+
+            group.ChangeStudentGrade(
+                student.RecordBookNumber,
+                "C#",
+                95
+            );
+
+            group.RemoveStudent(student.RecordBookNumber);
+        }
+        static void ShowPerformOperationOnStudentsDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== PerformOperationOnStudents ===");
+
+            group.PerformOperationOnStudents(
+                student => student.averageGrade >= 90,
+                student =>
+                {
+                    Console.WriteLine($"Відмінник: {student.FullName}");
+                    Console.WriteLine($"Середній бал: {student.averageGrade}");
+                }
+            );
+        }
+        static void ShowLambdaSortingDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== СОРТУВАННЯ ЛЯМБДА-ВИРАЗАМИ ===");
+
+            Console.WriteLine("1. За ПІБ");
+            Console.WriteLine("2. За середнім балом спаданням");
+            Console.WriteLine("3. За прогресом навчання спаданням");
+
+            string choice = Console.ReadLine();
+
+            List<Student> sorted;
+
+            if (choice == "1")
+            {
+                sorted = group.SortStudentsByLambda(s => s.FullName);
+            }
+            else if (choice == "2")
+            {
+                sorted = group.SortStudentsByLambda(s => s.averageGrade, true);
+            }
+            else
+            {
+                sorted = group.SortStudentsByLambda(s => s.CourseProgress, true);
+            }
+
+            foreach (Student student in sorted)
+            {
+                Console.WriteLine(
+                    $"{student.FullName} | Бал: {student.averageGrade} | Прогрес: {student.CourseProgress}%"
+                );
+            }
+        }
+        static void ShowAverageGradeChangedDemo(StudentGroup group)
+        {
+            Console.WriteLine("=== AverageGradeChanged у Student ===");
+
+            Student student = new Student(
+                "Студент Зміни Середнього",
+                new DateTime(2005, 1, 1),
+                "average@student.com",
+                DateTime.Now,
+                DateTime.Now.Ticks.ToString().Substring(0, 8),
+                "Тест AverageGradeChanged"
+            );
+
+            
+
+            group.AddStudent(student);
+
+            double oldAverage = student.averageGrade;
+
+            student.Journal.SetGrade("C#", 100);
+
+            student.CheckAverageGradeChanged(oldAverage);
+        }
+    }
 }

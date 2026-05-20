@@ -23,13 +23,15 @@ namespace ConsoleApp1
         public string Specialty { get; set; }
         public int Course { get; set; }
         public int GroupSize => _students.Count;
+        public event EventHandler<StudentEventArgs> StudentAdded;
+        public event EventHandler<StudentEventArgs> StudentRemoved;
+        public event EventHandler<StudentEventArgs> GradeChanged;
         public double AverageGroupGrade => _students.Count == 0 ? 0 : Math.Round(_students.Average(s => s.averageGrade), 2);
         private PortMatrix portMatrix = new();
         private PortLogger logger = new();
         private GradeRecord[] gradeHistory = Array.Empty<GradeRecord>();
         private Point[] labPlaces = Array.Empty<Point>();
         private StudentRecord[] studentRecords = Array.Empty<StudentRecord>();
-        // ghfrnbxyf 5 5
         public void AddMember(UniversityMember member)
         {
             _members.Add(member);
@@ -44,8 +46,6 @@ namespace ConsoleApp1
         {
             return _members.Sum(m => m.CalculateScholarship());
         }
-        // ghfrnbxyf 5 5 
-        // ghfrnxyf 5 5
         public void AddStudent(Student s)
         {
             if (_members.OfType<Student>().Any(x => x.RecordBookNumber == s.RecordBookNumber))
@@ -53,11 +53,34 @@ namespace ConsoleApp1
 
             _members.Add(s);
 
+            StudentAdded?.Invoke(
+                this,
+                new StudentEventArgs(
+                    s,
+                    $"Студента {s.FullName} додано до групи."
+                )
+            );
         }
-        // r
         public void RemoveStudent(string recordBookNumber)
         {
-            _members.RemoveAll(s => s is Student st && st.RecordBookNumber == recordBookNumber);
+            Student student = _students.FirstOrDefault(
+                s => s.RecordBookNumber == recordBookNumber
+            );
+
+            if (student == null)
+                return;
+
+            _members.RemoveAll(
+                s => s is Student st && st.RecordBookNumber == recordBookNumber
+            );
+
+            StudentRemoved?.Invoke(
+                this,
+                new StudentEventArgs(
+                    student,
+                    $"Студента {student.FullName} видалено з групи."
+                )
+            );
         }
         public List<Student> FindByName(string query)
         {
@@ -565,6 +588,56 @@ namespace ConsoleApp1
         public void PerformGroupOperation(GroupOperation operation)
         {
             operation(this);
+        }
+        public void ChangeStudentGrade(
+    string recordBookNumber,
+    string subject,
+    double grade)
+        {
+            Student student = FindByRecordBook(recordBookNumber);
+
+            if (student == null)
+                throw new Exception("Студента не знайдено.");
+
+            double oldAverage = student.averageGrade;
+
+            student.Journal.SetGrade(subject, grade);
+
+            double newAverage = student.averageGrade;
+
+            GradeChanged?.Invoke(
+                this,
+                new StudentEventArgs(
+                    student,
+                    $"Оцінку студента {student.FullName} змінено. Середній бал: {oldAverage} -> {newAverage}"
+                )
+            );
+
+            student.CheckAverageGradeChanged(oldAverage);
+        }
+        public void PerformOperationOnStudents(
+    Func<Student, bool> predicate,
+    Action<Student> action)
+        {
+            foreach (Student student in _students.Where(predicate))
+            {
+                action(student);
+            }
+        }
+        public List<Student> SortStudentsByLambda(
+    Func<Student, object> keySelector,
+    bool descending = false)
+        {
+            if (descending)
+            {
+                return _students
+                    .OrderByDescending(keySelector)
+                    .ToList();
+            }
+
+            return _students
+                .OrderBy(keySelector)
+                .ToList();
         }
     }
 }
