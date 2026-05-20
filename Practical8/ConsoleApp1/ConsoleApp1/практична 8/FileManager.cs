@@ -22,43 +22,28 @@ namespace ConsoleApp1.практична_8
 
         public T LoadFromJson<T>(string filePath)
         {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("Файл не знайдено.", filePath);
+
+            if (Path.GetExtension(filePath).ToLower() != ".json")
+                throw new InvalidFileFormatException("Файл повинен мати формат .json");
+
             try
             {
-                if (!File.Exists(filePath))
-                    throw new FileNotFoundException(
-                        "Файл не знайдено.",
-                        filePath
-                    );
-
-                if (Path.GetExtension(filePath).ToLower() != ".json")
-                    throw new InvalidFileFormatException(
-                        "Файл повинен мати формат .json"
-                    );
-
                 string json = File.ReadAllText(filePath, Encoding.UTF8);
-
                 return JsonSerializer.Deserialize<T>(json, options);
             }
             catch (JsonException ex)
             {
-                throw new JsonException(
-                    "Помилка десеріалізації JSON.",
-                    ex
-                );
+                throw new JsonException("Помилка десеріалізації JSON.", ex);
             }
             catch (UnauthorizedAccessException ex)
             {
-                throw new UnauthorizedAccessException(
-                    "Немає доступу до файлу.",
-                    ex
-                );
+                throw new UnauthorizedAccessException("Немає доступу до файлу.", ex);
             }
             catch (IOException ex)
             {
-                throw new IOException(
-                    "Помилка роботи з файлом.",
-                    ex
-                );
+                throw new IOException("Помилка роботи з файлом.", ex);
             }
         }
 
@@ -70,30 +55,13 @@ namespace ConsoleApp1.практична_8
 
         public string ReadFromText(string filePath)
         {
-            try
-            {
-                if (!File.Exists(filePath))
-                    throw new FileNotFoundException(
-                        "Файл не знайдено.",
-                        filePath
-                    );
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("Шлях до файлу порожній.");
 
-                return File.ReadAllText(filePath, Encoding.UTF8);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                throw new UnauthorizedAccessException(
-                    "Немає доступу до файлу.",
-                    ex
-                );
-            }
-            catch (IOException ex)
-            {
-                throw new IOException(
-                    "Помилка читання файлу.",
-                    ex
-                );
-            }
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("Файл не знайдено.", filePath);
+
+            return File.ReadAllText(filePath, Encoding.UTF8);
         }
 
         public void ExportToCsv(StudentGroup group, string filePath)
@@ -227,9 +195,10 @@ namespace ConsoleApp1.практична_8
                     group.AddStudent(student);
                     
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // пропускаємо некоректні рядки
+                    Console.WriteLine($"Тип помилки: {ex.GetType().Name}");
+                    Console.WriteLine($"Повідомлення: {ex.Message}");
                 }
                 Console.WriteLine("Імпорт студентів завершено.");
             }

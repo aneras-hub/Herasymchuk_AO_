@@ -129,9 +129,9 @@ namespace ConsoleApp1
                     );
                     AddStudent(student);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // пропускаємо некоректний запис
+                    Console.WriteLine($"Помилка імпорту рядка: {ex.Message}");
                 }
             }
         }

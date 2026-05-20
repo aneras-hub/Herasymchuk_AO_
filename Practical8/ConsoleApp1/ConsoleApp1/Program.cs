@@ -771,8 +771,9 @@ class Program
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Помилка: {ex.Message}");
-                return;
+                Console.WriteLine($"Тип помилки: {ex.GetType().Name}");
+                Console.WriteLine($"Повідомлення: {ex.Message}");
+            return;
             }
             Console.Write("Новий бал (Enter = пропустити): ");
             string gradeInput = Console.ReadLine();
