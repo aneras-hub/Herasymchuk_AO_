@@ -192,5 +192,45 @@ namespace ConsoleApp1.практична_8
 
             return Directory.GetFiles(directoryPath);
         }
+
+
+
+
+
+        public void ImportStudentsFromCsv(StudentGroup group, string filePath)
+        {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("CSV-файл не знайдено.", filePath);
+
+            string[] lines = File.ReadAllLines(filePath, Encoding.UTF8);
+
+            foreach (string line in lines.Skip(1))
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                string[] parts = line.Split(';');
+
+                if (parts.Length < 3)
+                    continue;
+
+                try
+                {
+                    Student student = new Student(
+                        parts[0].Trim(),
+                        DateTime.Now.AddYears(-18),
+                        parts[2].Trim(),
+                        DateTime.Now,
+                        parts[1].Trim()
+                    );
+
+                    group.AddStudent(student);
+                }
+                catch
+                {
+                    // пропускаємо некоректні рядки
+                }
+            }
+        }
     }
 }
