@@ -684,7 +684,7 @@ class Program
         static void DelegatesPracticeMenu(StudentGroup group, AdvancedLogger advancedLogger)
         {
             NotificationSystem notificationSystem = new NotificationSystem();
-
+            UndoRedoManager undoRedo = new UndoRedoManager();
             notificationSystem.StudentAdded += (sender, e) =>
             {
                 Console.WriteLine($"[LOG] {e.Message}");
@@ -715,6 +715,9 @@ class Program
                 Console.WriteLine("6. Сортування студентів лямбда-виразами");
                 Console.WriteLine("7. Тестування callback-механізмів");
                 Console.WriteLine("8. Переглянути історію подій");
+                Console.WriteLine("9. Undo останньої дії");
+                Console.WriteLine("10. Redo останньої дії");
+                Console.WriteLine("11. Демонстрація Undo/Redo");
                 Console.WriteLine("0. Назад");
 
                 Console.Write("\nВаш вибір: ");
@@ -757,6 +760,17 @@ class Program
                         notificationSystem.ShowHistory();
                         break;
 
+                    case "9":
+                        undoRedo.Undo();
+                        break;
+
+                    case "10":
+                        undoRedo.Redo();
+                        break;
+
+                    case "11":
+                        ShowUndoRedoDemo(group, undoRedo);
+                        break;
                     case "0":
                         return;
 
@@ -2190,6 +2204,47 @@ class Program
                 student => student.averageGrade >= 0,
                 callback
             );
+        }
+
+
+
+
+        static void ShowUndoRedoDemo(
+    StudentGroup group,
+    UndoRedoManager undoRedo)
+        {
+            Console.WriteLine("=== UNDO / REDO DEMO ===");
+
+            Student student = new Student(
+                "Undo Redo Студент",
+                new DateTime(2005, 1, 1),
+                "undo@test.com",
+                DateTime.Now,
+                Guid.NewGuid().ToString("N").Substring(0, 8),
+                "Тест undo redo"
+            );
+
+            undoRedo.ExecuteAction(
+                redoAction: () =>
+                {
+                    group.AddStudent(student);
+                },
+
+                undoAction: () =>
+                {
+                    group.RemoveStudent(student.RecordBookNumber);
+                },
+
+                description: "Додавання студента"
+            );
+
+            Console.WriteLine("\nСтудента додано.");
+
+            Console.WriteLine("\nВиконуємо Undo...");
+            undoRedo.Undo();
+
+            Console.WriteLine("\nВиконуємо Redo...");
+            undoRedo.Redo();
         }
     }
 }
